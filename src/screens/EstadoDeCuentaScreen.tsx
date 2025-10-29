@@ -121,7 +121,7 @@ export default function EstadoDeCuentaScreen() {
         </View>
 
         {/* Información del Estado de Cuenta */}
-        <View style={styles.infoCard}>
+        {/* <View style={styles.infoCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="document-text-outline" size={24} color={COLORS.PRIMARY_GREEN} />
             <Text style={styles.cardTitle}>Detalles de Cuenta</Text>
@@ -168,10 +168,10 @@ export default function EstadoDeCuentaScreen() {
             </View>
 
           </View>
-        </View>
+        </View> */}
 
         {/* Historial de Pagos */}
-        <View style={styles.infoCard}>
+        {/* <View style={styles.infoCard}>
           <View style={styles.cardHeader}>
             <Ionicons name="time-outline" size={24} color={COLORS.PRIMARY_GREEN} />
             <Text style={styles.cardTitle}>Historial de Pagos</Text>
@@ -192,7 +192,7 @@ export default function EstadoDeCuentaScreen() {
           ) : (
             <Text style={styles.paymentLabel}>No hay historial de pagos disponible</Text>
           )}
-        </View>
+        </View> */}
 
       </ScrollView>
       <FloatingChatBot />
