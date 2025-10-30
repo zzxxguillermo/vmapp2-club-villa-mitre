@@ -1,11 +1,20 @@
+// HomeScreen.tsx
 import React from 'react';
-import { View, Alert, TouchableOpacity } from 'react-native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
+import { Alert, TouchableOpacity } from 'react-native';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import type {
+  DrawerContentComponentProps,
+  DrawerNavigationProp,
+} from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../components/Logo';
 import { CommonActions } from '@react-navigation/native';
 import { useAuth } from '../hooks/useAuth';
+import DetalleCuponScreen from './DetalleCuponScreen';
 
 import HomeMainScreen from './HomeMainScreen';
 import ActividadesScreen from './ActividadesScreen';
@@ -17,135 +26,145 @@ import MisBeneficiosScreen from './MisBeneficiosScreen';
 import EstadoDeCuentaScreen from './EstadoDeCuentaScreen';
 import MiCarnetScreen from './MiCarnetScreen';
 import QRBeneficioScreen from './QRBeneficioScreen';
-import GimnasioScreen from './GimnasioScreen'; // ✅ Pantalla principal del gimnasio
-import TemplateDetailScreen from './gym/TemplateDetailScreen'; // ✅ Detalle de rutina
-import WeeklyScheduleScreen from './gym/WeeklyScheduleScreen'; // ✅ Calendario semanal
+import GimnasioScreen from './GimnasioScreen';
+import TemplateDetailScreen from './gym/TemplateDetailScreen';
+import WeeklyScheduleScreen from './gym/WeeklyScheduleScreen';
+// ❌ import eliminado:
+// import MisCuponesScreen from './MisCuponesScreen';
 
-const Drawer = createDrawerNavigator();
+// -------- Param list para tipar rutas --------
+type DrawerParamList = {
+  HomeMain: undefined;
+  Actividades: undefined;
+  CentroDeportivo: undefined;
+  Gimnasio: undefined;
+  TemplateDetails: { id?: string } | undefined;
+  WeeklySchedule: undefined;
+  // ❌ MisCupones eliminado
+  AreasInstitucionales: undefined;
+  Servicios: undefined;
+  MisPuntos: undefined;
+  QRBeneficio: { code?: string } | undefined;
+  MisBeneficios: undefined; // ✅ mantenemos MisBeneficios
+  EstadoDeCuenta: undefined;
+  MiCarnet: undefined;
+};
 
-// Contenido personalizado del Drawer
-function CustomDrawerContent(props: any) {
+const Drawer = createDrawerNavigator<DrawerParamList>();
+
+// -------- Drawer personalizado --------
+function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { logout, user } = useAuth();
+  const nav = props.navigation as DrawerNavigationProp<DrawerParamList>;
 
-  // Función para verificar si el usuario tiene acceso a una funcionalidad
   const hasAccess = (feature: string): boolean => {
-    if (!user) return false;
-    
-    const userType = user.user_type;
-    
+    const userType = user?.user_type;
     switch (feature) {
       case 'home':
-        return true; // Todos tienen acceso a Home
       case 'actividades_deportivas':
       case 'centro_deportivo':
       case 'areas_institucionales':
       case 'servicios':
-        return true; // Usuarios locales y API pueden acceder
-      case 'beneficios':
-        return true; // Usuarios locales y API pueden acceder
+      case 'beneficios': // ✅ acceso público a beneficios
+        return true;
       case 'mis_puntos':
       case 'carnet':
       case 'estado_cuenta':
-        return userType === 'api'; // Solo usuarios API
-      case 'actividades':
-      case 'cupones':
-        return false; // Temporalmente deshabilitado para todos
+        return userType === 'api';
       default:
         return false;
     }
   };
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro que deseas cerrar sesión?',
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
+    Alert.alert('Cerrar Sesión', '¿Estás seguro que deseas cerrar sesión?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Cerrar Sesión',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await logout();
+            props.navigation.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: 'Login' as never }],
+              })
+            );
+          } catch {
+            Alert.alert('Error', 'No se pudo cerrar la sesión correctamente');
+          }
         },
-        {
-          text: 'Cerrar Sesión',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              // Ejecutar logout del servicio de autenticación
-              await logout();
-              
-              // Navegar de vuelta a la pantalla de login
-              props.navigation.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: 'Login' }],
-                })
-              );
-            } catch (error) {
-              Alert.alert('Error', 'No se pudo cerrar la sesión correctamente');
-            }
-          },
-        },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
     <DrawerContentScrollView {...props}>
-      {/* Home - Disponible para todos */}
+      {/* Home */}
       {hasAccess('home') && (
         <DrawerItem
           label="Home"
           icon={() => <Ionicons name="home-outline" size={22} />}
-          onPress={() => props.navigation.navigate('HomeMain')}
+          onPress={() => nav.navigate('HomeMain')}
         />
       )}
 
-      {/* Actividades Deportivas - Solo usuarios API */}
+      {/* Actividades Deportivas */}
       {hasAccess('actividades_deportivas') && (
         <DrawerItem
           label="Actividades Deportivas"
           icon={() => <Ionicons name="basketball-outline" size={22} />}
-          onPress={() => props.navigation.navigate('Actividades')}
+          onPress={() => nav.navigate('Actividades')}
         />
       )}
 
-      {/* Centro Deportivo - Solo usuarios API */}
+      {/* Centro Deportivo */}
       {hasAccess('centro_deportivo') && (
         <DrawerItem
           label="Centro Deportivo"
           icon={() => <Ionicons name="fitness-outline" size={22} />}
-          onPress={() => props.navigation.navigate('CentroDeportivo')}
+          onPress={() => nav.navigate('CentroDeportivo')}
         />
       )}
 
-      {/* Áreas Institucionales - Solo usuarios API */}
+      {/* Áreas Institucionales */}
       {hasAccess('areas_institucionales') && (
         <DrawerItem
           label="Áreas Institucionales"
           icon={() => <Ionicons name="business-outline" size={22} />}
-          onPress={() => props.navigation.navigate('AreasInstitucionales')}
+          onPress={() => nav.navigate('AreasInstitucionales')}
         />
       )}
 
-      {/* Servicios - Solo usuarios API */}
+      {/* Servicios */}
       {hasAccess('servicios') && (
         <DrawerItem
           label="Servicios"
           icon={() => <Ionicons name="grid-outline" size={22} />}
-          onPress={() => props.navigation.navigate('Servicios')}
+          onPress={() => nav.navigate('Servicios')}
         />
       )}
 
+      {/* ✅ Mis Beneficios (reemplaza Mis Cupones) */}
+      {hasAccess('beneficios') && (
+        <DrawerItem
+          label="Mis Beneficios"
+          icon={() => <Ionicons name="gift-outline" size={22} />}
+          onPress={() => nav.navigate('MisBeneficios')}
+        />
+      )}
 
-      {/* Mis Puntos - Solo usuarios API */}
+      {/* Mis Puntos */}
       {hasAccess('mis_puntos') && (
         <DrawerItem
           label="Mis Puntos"
           icon={() => <Ionicons name="star-outline" size={22} />}
-          onPress={() => props.navigation.navigate('MisPuntos')}
+          onPress={() => nav.navigate('MisPuntos')}
         />
       )}
 
-      {/* Cerrar Sesión - Disponible para todos */}
+      {/* Cerrar Sesión */}
       <DrawerItem
         label="Cerrar Sesión"
         icon={() => <Ionicons name="log-out-outline" size={22} color="#FF4444" />}
@@ -156,18 +175,15 @@ function CustomDrawerContent(props: any) {
   );
 }
 
-// Drawer Navigator principal
+// -------- Drawer principal --------
 export default function HomeScreen() {
   return (
     <Drawer.Navigator
       initialRouteName="HomeMain"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={({ navigation }) => ({ 
+      screenOptions={({ navigation }) => ({
         headerShown: true,
-        headerStyle: {
-          backgroundColor: '#00973D',
-          height: 110,
-        },
+        headerStyle: { backgroundColor: '#00973D', height: 110 },
         headerTintColor: '#FFFFFF',
         headerTitleStyle: {
           fontFamily: 'BarlowCondensed-Bold',
@@ -177,11 +193,11 @@ export default function HomeScreen() {
           marginLeft: 0,
           textAlign: 'center',
           textTransform: 'uppercase',
-          color: '#FFFFFF', // Cambiado a blanco
+          color: '#FFFFFF',
         },
         headerTitle: 'CLUB VILLA MITRE',
         headerRight: () => (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={{ paddingRight: 20, justifyContent: 'center', alignItems: 'center' }}
             onPress={() => navigation.navigate('HomeMain')}
             activeOpacity={0.7}
@@ -191,40 +207,55 @@ export default function HomeScreen() {
         ),
       })}
     >
-      <Drawer.Screen 
-        name="HomeMain" 
+      <Drawer.Screen
+        name="HomeMain"
         component={HomeMainScreen}
         options={{ headerTitle: 'CLUB VILLA MITRE' }}
       />
+
       <Drawer.Screen name="Actividades" component={ActividadesScreen} />
       <Drawer.Screen name="CentroDeportivo" component={CentroDeportivoScreen} />
-      
-      {/* ✅ Gimnasio - Pantalla Principal (API v2.0) */}
-      <Drawer.Screen 
-        name="Gimnasio" 
+
+      {/* ✅ Gimnasio */}
+      <Drawer.Screen
+        name="Gimnasio"
         component={GimnasioScreen}
         options={{ headerTitle: 'GIMNASIO' }}
       />
-      
+
       {/* ✅ Detalle de Rutina */}
-      <Drawer.Screen 
-        name="TemplateDetails" 
+      <Drawer.Screen
+        name="TemplateDetails"
         component={TemplateDetailScreen}
         options={{ headerTitle: 'Detalle de Rutina' }}
       />
-      
+
+      <Drawer.Screen
+        name="DetalleCupon"
+        component={DetalleCuponScreen}
+        options={({ route }) => {
+          const p: any = route?.params ?? {};
+          const obj = p?.beneficio ?? p?.cupon ?? p?.item ?? p?.promotion ?? p?.promo ?? {};
+          const title = obj?.titulo ?? obj?.title ?? 'Detalle';
+          return { title };
+        }}
+      />
+
       {/* ✅ Calendario Semanal */}
-      <Drawer.Screen 
-        name="WeeklySchedule" 
+      <Drawer.Screen
+        name="WeeklySchedule"
         component={WeeklyScheduleScreen}
         options={{ headerTitle: 'Calendario Semanal' }}
       />
-      
+
+      {/* ❌ MisCupones eliminado
+      <Drawer.Screen name="MisCupones" component={MisCuponesScreen} />
+      */}
+
       <Drawer.Screen name="AreasInstitucionales" component={AreasInstitucionalesScreen} />
       <Drawer.Screen name="Servicios" component={ServiciosScreen} />
       <Drawer.Screen name="MisPuntos" component={MisPuntosScreen} />
       <Drawer.Screen name="QRBeneficio" component={QRBeneficioScreen} />
-      {/* Pantallas mantenidas para compatibilidad con navegación desde Home */}
       <Drawer.Screen name="MisBeneficios" component={MisBeneficiosScreen} />
       <Drawer.Screen name="EstadoDeCuenta" component={EstadoDeCuentaScreen} />
       <Drawer.Screen name="MiCarnet" component={MiCarnetScreen} />
