@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { gymService } from '../../services/gymService';
@@ -19,7 +19,7 @@ import { DifficultyBadge } from '../../components/gym/DifficultyBadge';
 type TemplateDetailParams = {
   templateId: number;
   templateName: string;
-  preloadedTemplate?: DailyTemplate | null;
+  preloadedTemplate?: DailyTemplate | null; // DEPRECATED: Ya no se usa, siempre se cargan datos frescos
 };
 
 type TemplateDetailRouteProp = RouteProp<
@@ -30,31 +30,30 @@ type TemplateDetailRouteProp = RouteProp<
 export default function TemplateDetailScreen() {
   const route = useRoute<TemplateDetailRouteProp>();
   const navigation = useNavigation();
-  const { templateId, templateName, preloadedTemplate } = route.params;
+  // Nota: preloadedTemplate se ignora intencionalmente para siempre mostrar datos frescos
+  const { templateId, templateName } = route.params;
 
-  const [template, setTemplate] = useState<DailyTemplate | null>(preloadedTemplate || null);
-  const [loading, setLoading] = useState(!preloadedTemplate);
+  const [template, setTemplate] = useState<DailyTemplate | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedSets, setExpandedSets] = useState<{ [key: number]: boolean }>({});
 
-  useEffect(() => {
-    // Solo cargar si no tenemos datos precargados
-    if (!preloadedTemplate) {
+  // Forzar recarga de datos cada vez que se enfoca la pantalla
+  // Esto asegura que siempre se muestren los datos más recientes del backend
+  useFocusEffect(
+    useCallback(() => {
+      console.log('🔄 Pantalla enfocada - Recargando datos frescos del servidor...');
       loadTemplate();
-    } else {
-      console.log('✅ Usando datos precargados de rutina');
-      // Expandir primer set por defecto
-      if (preloadedTemplate.sets.length > 0) {
-        setExpandedSets({ [preloadedTemplate.sets[0].id]: true });
-      }
-    }
-  }, [templateId, preloadedTemplate]);
+    }, [templateId])
+  );
 
   const loadTemplate = async () => {
     try {
       setLoading(true);
       setError(null);
+      console.log(`📥 Cargando datos frescos de rutina ID: ${templateId} desde el servidor...`);
       const data = await gymService.getTemplateDetails(templateId);
+      console.log(`✅ Datos actualizados recibidos: ${data.name} - ${data.sets.length} sets, ${data.sets.reduce((acc, set) => acc + set.exercises.length, 0)} ejercicios`);
       setTemplate(data);
       
       // Expand first set by default
@@ -62,7 +61,7 @@ export default function TemplateDetailScreen() {
         setExpandedSets({ [data.sets[0].id]: true });
       }
     } catch (err: any) {
-      console.error('Error loading template:', err);
+      console.error('❌ Error loading template:', err);
       setError(err.message || 'Error al cargar la rutina');
       Alert.alert(
         'Error',

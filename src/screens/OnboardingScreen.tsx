@@ -146,29 +146,22 @@ export default function OnboardingScreen() {
         bounces={false}
       >
         {slides.map((slide) => (
-          <View key={slide.id} style={[styles.slide, { width, height }]}>
+          <View key={slide.id} style={[styles.slide, { width, height }]}> 
             {/* Imagen completa (ya tiene todos los elementos de diseño) */}
             <Image source={slide.image} style={styles.image} />
-            
-            {/* Contenedor inferior para controles */}
-            <View style={styles.controlsContainer}>
-              {/* Botón principal */}
-              <TouchableOpacity
-                style={[
-                  styles.button,
-                  slide.id === 4 && styles.buttonGreen, // Verde en último slide
-                ]}
-                onPress={handleButtonPress}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.buttonText}>{slide.buttonText}</Text>
-              </TouchableOpacity>
 
-              {/* Link de Omitir */}
-              <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-                <Text style={styles.skipText}>Omitir</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Solo el slide 4 muestra controles: un único botón INGRESAR */}
+            {slide.id === 4 && (
+              <View style={styles.controlsContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonGreen]}
+                  onPress={() => navigateWithAnimation('Login')}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.buttonText}>INGRESAR</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         ))}
       </ScrollView>

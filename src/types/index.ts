@@ -47,8 +47,8 @@ export interface Usuario {
   telefono?: string;
   celular?: string;
   categoria?: string;
-  socio_id?: string;
-  socio_n?: string; // Número de socio real del club (campo principal)
+  socio_id?: string; // ID de socio del club (usado para URLs de fotos)
+  socio_n?: string; // Número de socio real del club
   barcode?: string;
   estado_socio?: string;
   api_updated_at?: string;

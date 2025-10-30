@@ -63,7 +63,7 @@ export const mapBackendUserToFrontend = (backendUser: any): Usuario => {
     // Legacy fields for compatibility with existing components
     fotoUrl: backendUser.foto_url || backendUser.profileImage || backendUser.image || backendUser.avatar || backendUser.photo || backendUser.picture || '',
     profileImage: backendUser.foto_url || backendUser.profileImage || backendUser.image || backendUser.avatar || backendUser.photo || backendUser.picture || '',
-    nroSocio: backendUser.socio_n || backendUser.socio_id || backendUser.id?.toString() || '', // Prioridad: socio_n > socio_id > id
+    nroSocio: backendUser.socio_id || backendUser.socio_n || backendUser.id?.toString() || '', // Prioridad: socio_id > socio_n > id (socio_id se usa para URLs de fotos)
     codigoBarras: backendUser.barcode || '',
     validoHasta: backendUser.api_updated_at || 
                  new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
