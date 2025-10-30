@@ -14,6 +14,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { FloatingChatBot } from '../components/FloatingChatBot';
 import { COLORS } from '../constants/colors';
 
+/* ===================== IMPORTS DE IMÁGENES LOCALES ===================== */
+import FutbolImg from '../../assets/actividades/futbol.jpg';
+import BasquetImg from '../../assets/actividades/basket.jpeg';
+import PatinImg from '../../assets/actividades/patin.jpg';
+import VoleyImg from '../../assets/actividades/voley.jpg';
+import GimnasiaArtisticaImg from '../../assets/actividades/gimnasia_artistica.jpg';
+import HockeyImg from '../../assets/actividades/hockey_(1).jpg';
+import HockeyPatinesImg from '../../assets/actividades/hockey_sobre_patines.png';
+import FutsalImg from '../../assets/actividades/futsal.jpg';
+import KarateImg from '../../assets/actividades/karate.jpg';
+import BoxeoImg from '../../assets/actividades/boxeo.jpg';
+// Nota: Existe futbol_femenino.jpg en assets, pero acá usamos una sola tarjeta "Fútbol" con ambos contactos.
+
 type Contacto = { label: string; value: string };
 type Actividad = {
   id: string;
@@ -22,7 +35,8 @@ type Actividad = {
   detalle: string;       // "Masculino y Femenino +4", "Mixto +3", etc.
   lugar: string;         // "Predio Deportivo La Ciudad", "Sede de Garibaldi", etc.
   contactos: Contacto[]; // Uno o varios contactos
-  imagenUrl: string | number; // string para URLs, number para require() local
+  // Import/require estático devuelve number; las remotas serán string:
+  imagenUrl: number | string;
 };
 
 const { width } = Dimensions.get('window');
@@ -36,10 +50,10 @@ const futbol: Actividad = {
   detalle: 'Masculino y Femenino +4',
   lugar: 'Predio Deportivo La Ciudad',
   contactos: [
-    { label: 'CONTACTO FÚTBOL MASCULINO', value: '2914737900' }, // (ex Matias)
-    { label: 'CONTACTO FÚTBOL FEMENINO', value: '2915741716' },  // (ex Lorena)
+    { label: 'CONTACTO FÚTBOL MASCULINO', value: '2914737900' },
+    { label: 'CONTACTO FÚTBOL FEMENINO', value: '2915741716' },
   ],
-  imagenUrl: require('../../assets/actividades/futbol.jpg'),
+  imagenUrl: FutbolImg,
 };
 
 /* 2) Básquet (Masculino/Femenino +3) - Predio Deportivo La Ciudad */
@@ -50,21 +64,21 @@ const basquet: Actividad = {
   detalle: 'Masculino y Femenino +3',
   lugar: 'Predio Deportivo La Ciudad',
   contactos: [
-    { label: 'CONTACTO BÁSQUET MASCULINO', value: '2915748545' }, // (ex Silvio)
-    { label: 'CONTACTO BÁSQUET FEMENINO', value: '2914133548' },  // (ex Alejandra)
+    { label: 'CONTACTO BÁSQUET MASCULINO', value: '2915748545' },
+    { label: 'CONTACTO BÁSQUET FEMENINO', value: '2914133548' },
   ],
-  imagenUrl: require('../../assets/actividades/basket.jpeg'),
+  imagenUrl: BasquetImg,
 };
 
-/* 3) Patín (Mixto +3) - Sede de Garibaldi (foto la cambiás vos) */
+/* 3) Patín (Mixto +3) - Sede de Garibaldi */
 const patin: Actividad = {
   id: 'patin',
   icono: '⛸️',
   titulo: 'Patín',
   detalle: 'Mixto +3',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2914370612' }], // (ex Lorena)
-  imagenUrl: require('../../assets/actividades/patin.jpg'), // la cambiás vos
+  contactos: [{ label: 'CONTACTO', value: '2914370612' }],
+  imagenUrl: PatinImg,
 };
 
 /* 4) Vóley (Mixto +6) - Sede de Garibaldi */
@@ -75,7 +89,7 @@ const voley: Actividad = {
   detalle: 'Mixto +6',
   lugar: 'Sede de Garibaldi',
   contactos: [{ label: 'CONTACTO', value: 'IG: @villa_mitre_voley' }],
-  imagenUrl: require('../../assets/actividades/voley.jpg'),
+  imagenUrl: VoleyImg,
 };
 
 /* 5) Gimnasia Artística (Mixto +3) - Sede de Garibaldi */
@@ -86,7 +100,7 @@ const gimnasiaArtistica: Actividad = {
   detalle: 'Mixto +3',
   lugar: 'Sede de Garibaldi',
   contactos: [{ label: 'CONTACTO', value: 'IG: @gimnasiaartisticacvmbb' }],
-  imagenUrl: require('../../assets/actividades/gimnasia_artistica.jpg'),
+  imagenUrl: GimnasiaArtisticaImg,
 };
 
 /* 6) Hockey (Mixto +6) - Predio Deportivo La Ciudad */
@@ -96,19 +110,19 @@ const hockey: Actividad = {
   titulo: 'Hockey',
   detalle: 'Mixto +6',
   lugar: 'Predio Deportivo La Ciudad',
-  contactos: [{ label: 'CONTACTO', value: '2915754040' }], // (ex Sergio)
-  imagenUrl: require('../../assets/actividades/hockey_(1).jpg'),
+  contactos: [{ label: 'CONTACTO', value: '2915754040' }],
+  imagenUrl: HockeyImg,
 };
 
-/* 7) Handball (Mixto +6) - Sede de Garibaldi (poner foto) */
+/* 7) Handball (Mixto +6) - Sede de Garibaldi (placeholder por ahora) */
 const handball: Actividad = {
   id: 'handball',
   icono: '🤾',
   titulo: 'Handball',
   detalle: 'Mixto +6',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2915669907' }], // (ex Joana)
-  imagenUrl: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&h=300&fit=crop', // placeholder; vos cambiás
+  contactos: [{ label: 'CONTACTO', value: '2915669907' }],
+  imagenUrl: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=1200&h=600&fit=crop',
 };
 
 /* 8) Hockey sobre Patines (Mixto +5) - Sede de Garibaldi */
@@ -118,8 +132,8 @@ const hockeyPatines: Actividad = {
   titulo: 'Hockey sobre Patines',
   detalle: 'Mixto +5',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2915064363' }], // (ex Guillermo)
-  imagenUrl: require('../../assets/actividades/hockey_sobre_patines.png'),
+  contactos: [{ label: 'CONTACTO', value: '2915064363' }],
+  imagenUrl: HockeyPatinesImg,
 };
 
 /* 9) Futsal (Masculino +16) - Sede de Garibaldi */
@@ -129,8 +143,8 @@ const futsal: Actividad = {
   titulo: 'Futsal',
   detalle: 'Masculino +16',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2914622376' }], // (ex Sergio)
-  imagenUrl: require('../../assets/actividades/futsal.jpg'),
+  contactos: [{ label: 'CONTACTO', value: '2914622376' }],
+  imagenUrl: FutsalImg,
 };
 
 /* 10) Karate (Mixto +7) - Sede de Garibaldi */
@@ -140,8 +154,8 @@ const karate: Actividad = {
   titulo: 'Karate',
   detalle: 'Mixto +7',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2915272778' }], // (ex Néstor)
-  imagenUrl: require('../../assets/actividades/karate.jpg'),
+  contactos: [{ label: 'CONTACTO', value: '2915272778' }],
+  imagenUrl: KarateImg,
 };
 
 /* 11) Boxeo (Mixto +7) - Espacio Villa Obrera */
@@ -151,30 +165,30 @@ const boxeo: Actividad = {
   titulo: 'Boxeo',
   detalle: 'Mixto +7',
   lugar: 'Espacio Villa Obrera',
-  contactos: [{ label: 'CONTACTO', value: '2914480251' }], // (ex Gonzalo)
-  imagenUrl: require('../../assets/actividades/boxeo.jpg'),
+  contactos: [{ label: 'CONTACTO', value: '2914480251' }],
+  imagenUrl: BoxeoImg,
 };
 
-/* 12) NewCom (Mixto +40) - Sede de Garibaldi (cambiar foto) */
+/* 12) NewCom (Mixto +40) - Sede de Garibaldi (usa foto de vóley por ahora) */
 const newcom: Actividad = {
   id: 'newcom',
   icono: '🏐',
   titulo: 'NewCom',
   detalle: 'Mixto +40',
   lugar: 'Sede de Garibaldi',
-  contactos: [{ label: 'CONTACTO', value: '2915704254' }], // (ex Patricia)
-  imagenUrl: require('../../assets/actividades/voley.jpg'), // placeholder; vos cambiás
+  contactos: [{ label: 'CONTACTO', value: '2915704254' }],
+  imagenUrl: VoleyImg,
 };
 
-/* 13) Zumba (Mixto +14) - Espacio Villa Obrera (cambiar foto) */
+/* 13) Zumba (Mixto +14) - Espacio Villa Obrera (placeholder) */
 const zumba: Actividad = {
   id: 'zumba',
   icono: '💃',
   titulo: 'Zumba',
   detalle: 'Mixto +14',
   lugar: 'Espacio Villa Obrera',
-  contactos: [{ label: 'CONTACTO', value: '2914220575' }], // (ex Romina)
-  imagenUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=300&fit=crop', // placeholder; vos cambiás
+  contactos: [{ label: 'CONTACTO', value: '2914220575' }],
+  imagenUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200&h=600&fit=crop',
 };
 
 const actividadesDeportivas: Actividad[] = [
@@ -233,10 +247,15 @@ export default function ActividadesScreen() {
         {actividadesDeportivas.map(actividad => (
           <View key={actividad.id} style={[styles.card, { width: screenWidth * 0.9 }]}>
             <Image
-              source={typeof actividad.imagenUrl === 'string' ? { uri: actividad.imagenUrl } : actividad.imagenUrl}
+              source={
+                typeof actividad.imagenUrl === 'string'
+                  ? { uri: actividad.imagenUrl }
+                  : actividad.imagenUrl
+              }
               style={styles.image}
               onLoadStart={() => handleImageLoadStart(actividad.id)}
               onLoadEnd={() => handleImageLoadEnd(actividad.id)}
+              resizeMode="cover"
             />
             {imageLoading[actividad.id] && (
               <ActivityIndicator size="large" color={COLORS.PRIMARY_GREEN} style={styles.loader} />
