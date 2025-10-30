@@ -69,7 +69,7 @@
       "API_BASE_URL": "https://appvillamitre.surtekbb.com/api",
       "DEBUG_API_CONNECTIVITY": false,
       "eas": {
-        "projectId": "bd5be84d-3bc6-4513-93b3-a324eeb9de34"
+        "projectId": "734fb05a-ed84-4160-8b50-72e3f5fd92fa"
       }
     },
     "updates": {
@@ -91,6 +91,7 @@
         }
       ],
       "./plugins/withAndroidQueries.js"
-    ]
+    ],
+    "owner": "javier_alejandro"
   }
 }

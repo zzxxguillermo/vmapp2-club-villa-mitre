@@ -1,194 +1,239 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   ActivityIndicator,
-  Alert,
-  TouchableOpacity,
   ScrollView,
   Image,
   Dimensions,
+  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FloatingChatBot } from '../components/FloatingChatBot';
 import { COLORS } from '../constants/colors';
 
+type Contacto = { label: string; value: string };
 type Actividad = {
   id: string;
   icono: string;
-  titulo: string;
-  detalle: string;
-  contacto: string;
+  titulo: string;        // "Fútbol", "Básquet", etc.
+  detalle: string;       // "Masculino y Femenino +4", "Mixto +3", etc.
+  lugar: string;         // "Predio Deportivo La Ciudad", "Sede de Garibaldi", etc.
+  contactos: Contacto[]; // Uno o varios contactos
   imagenUrl: string | number; // string para URLs, number para require() local
 };
 
-// ========================================
-// 🏃 ACTIVIDADES DEPORTIVAS DEL CLUB
-// ========================================
-// Actividades reales del Club Villa Mitre
-// Fotos ubicadas en: assets/actividades/
-// Actualizado: Octubre 2025
-// ========================================
+const { width } = Dimensions.get('window');
+
+/* ===================== DATA ORDENADA Y NORMALIZADA ===================== */
+/* 1) Fútbol (Masculino/Femenino +4) - Predio Deportivo La Ciudad */
+const futbol: Actividad = {
+  id: 'futbol',
+  icono: '⚽',
+  titulo: 'Fútbol',
+  detalle: 'Masculino y Femenino +4',
+  lugar: 'Predio Deportivo La Ciudad',
+  contactos: [
+    { label: 'CONTACTO FÚTBOL MASCULINO', value: '2914737900' }, // (ex Matias)
+    { label: 'CONTACTO FÚTBOL FEMENINO', value: '2915741716' },  // (ex Lorena)
+  ],
+  imagenUrl: require('../../assets/actividades/futbol.jpg'),
+};
+
+/* 2) Básquet (Masculino/Femenino +3) - Predio Deportivo La Ciudad */
+const basquet: Actividad = {
+  id: 'basquet',
+  icono: '🏀',
+  titulo: 'Básquet',
+  detalle: 'Masculino y Femenino +3',
+  lugar: 'Predio Deportivo La Ciudad',
+  contactos: [
+    { label: 'CONTACTO BÁSQUET MASCULINO', value: '2915748545' }, // (ex Silvio)
+    { label: 'CONTACTO BÁSQUET FEMENINO', value: '2914133548' },  // (ex Alejandra)
+  ],
+  imagenUrl: require('../../assets/actividades/basket.jpeg'),
+};
+
+/* 3) Patín (Mixto +3) - Sede de Garibaldi (foto la cambiás vos) */
+const patin: Actividad = {
+  id: 'patin',
+  icono: '⛸️',
+  titulo: 'Patín',
+  detalle: 'Mixto +3',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2914370612' }], // (ex Lorena)
+  imagenUrl: require('../../assets/actividades/patin.jpg'), // la cambiás vos
+};
+
+/* 4) Vóley (Mixto +6) - Sede de Garibaldi */
+const voley: Actividad = {
+  id: 'voley',
+  icono: '🏐',
+  titulo: 'Vóley',
+  detalle: 'Mixto +6',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: 'IG: @villa_mitre_voley' }],
+  imagenUrl: require('../../assets/actividades/voley.jpg'),
+};
+
+/* 5) Gimnasia Artística (Mixto +3) - Sede de Garibaldi */
+const gimnasiaArtistica: Actividad = {
+  id: 'gimnasia_artistica',
+  icono: '🤸',
+  titulo: 'Gimnasia Artística',
+  detalle: 'Mixto +3',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: 'IG: @gimnasiaartisticacvmbb' }],
+  imagenUrl: require('../../assets/actividades/gimnasia_artistica.jpg'),
+};
+
+/* 6) Hockey (Mixto +6) - Predio Deportivo La Ciudad */
+const hockey: Actividad = {
+  id: 'hockey',
+  icono: '🏑',
+  titulo: 'Hockey',
+  detalle: 'Mixto +6',
+  lugar: 'Predio Deportivo La Ciudad',
+  contactos: [{ label: 'CONTACTO', value: '2915754040' }], // (ex Sergio)
+  imagenUrl: require('../../assets/actividades/hockey_(1).jpg'),
+};
+
+/* 7) Handball (Mixto +6) - Sede de Garibaldi (poner foto) */
+const handball: Actividad = {
+  id: 'handball',
+  icono: '🤾',
+  titulo: 'Handball',
+  detalle: 'Mixto +6',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2915669907' }], // (ex Joana)
+  imagenUrl: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&h=300&fit=crop', // placeholder; vos cambiás
+};
+
+/* 8) Hockey sobre Patines (Mixto +5) - Sede de Garibaldi */
+const hockeyPatines: Actividad = {
+  id: 'hockey_patines',
+  icono: '🏒',
+  titulo: 'Hockey sobre Patines',
+  detalle: 'Mixto +5',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2915064363' }], // (ex Guillermo)
+  imagenUrl: require('../../assets/actividades/hockey_sobre_patines.png'),
+};
+
+/* 9) Futsal (Masculino +16) - Sede de Garibaldi */
+const futsal: Actividad = {
+  id: 'futsal',
+  icono: '⚽',
+  titulo: 'Futsal',
+  detalle: 'Masculino +16',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2914622376' }], // (ex Sergio)
+  imagenUrl: require('../../assets/actividades/futsal.jpg'),
+};
+
+/* 10) Karate (Mixto +7) - Sede de Garibaldi */
+const karate: Actividad = {
+  id: 'karate',
+  icono: '🥋',
+  titulo: 'Karate',
+  detalle: 'Mixto +7',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2915272778' }], // (ex Néstor)
+  imagenUrl: require('../../assets/actividades/karate.jpg'),
+};
+
+/* 11) Boxeo (Mixto +7) - Espacio Villa Obrera */
+const boxeo: Actividad = {
+  id: 'boxeo',
+  icono: '🥊',
+  titulo: 'Boxeo',
+  detalle: 'Mixto +7',
+  lugar: 'Espacio Villa Obrera',
+  contactos: [{ label: 'CONTACTO', value: '2914480251' }], // (ex Gonzalo)
+  imagenUrl: require('../../assets/actividades/boxeo.jpg'),
+};
+
+/* 12) NewCom (Mixto +40) - Sede de Garibaldi (cambiar foto) */
+const newcom: Actividad = {
+  id: 'newcom',
+  icono: '🏐',
+  titulo: 'NewCom',
+  detalle: 'Mixto +40',
+  lugar: 'Sede de Garibaldi',
+  contactos: [{ label: 'CONTACTO', value: '2915704254' }], // (ex Patricia)
+  imagenUrl: require('../../assets/actividades/voley.jpg'), // placeholder; vos cambiás
+};
+
+/* 13) Zumba (Mixto +14) - Espacio Villa Obrera (cambiar foto) */
+const zumba: Actividad = {
+  id: 'zumba',
+  icono: '💃',
+  titulo: 'Zumba',
+  detalle: 'Mixto +14',
+  lugar: 'Espacio Villa Obrera',
+  contactos: [{ label: 'CONTACTO', value: '2914220575' }], // (ex Romina)
+  imagenUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=300&fit=crop', // placeholder; vos cambiás
+};
 
 const actividadesDeportivas: Actividad[] = [
-  { 
-    id: '1', 
-    icono: '🥋', 
-    titulo: 'Karate', 
-    detalle: '+7 años (mixto)', 
-    contacto: 'Néstor 2915272778', 
-    imagenUrl: require('../../assets/actividades/karate.jpg')
-  },
-  { 
-    id: '2', 
-    icono: '🤸', 
-    titulo: 'Gimnasia Artística', 
-    detalle: '+3 años (mixto)', 
-    contacto: 'IG: @gimnasiaartisticacvmbb', 
-    imagenUrl: require('../../assets/actividades/gimnasia_artistica.jpg')
-  },
-  { 
-    id: '3', 
-    icono: '⛸️', 
-    titulo: 'Patín', 
-    detalle: '+3 años (mixto)', 
-    contacto: 'Lorena Carinelli 2914370612', 
-    imagenUrl: require('../../assets/actividades/patin.jpg')
-  },
-  { 
-    id: '4', 
-    icono: '🏐', 
-    titulo: 'Vóley', 
-    detalle: '+6 años (mixto)', 
-    contacto: 'IG: @villa_mitre_voley', 
-    imagenUrl: require('../../assets/actividades/voley.jpg')
-  },
-  { 
-    id: '5', 
-    icono: '🏐', 
-    titulo: 'Newcom', 
-    detalle: '+40 años (mixto)', 
-    contacto: 'Patricia Botte 2915704254', 
-    imagenUrl: require('../../assets/actividades/voley.jpg') // Usando imagen de vóley
-  },
-  { 
-    id: '6', 
-    icono: '🤾', 
-    titulo: 'Handball', 
-    detalle: '6 a 13 años', 
-    contacto: 'Joana Jant 2915669907', 
-    imagenUrl: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?w=600&h=300&fit=crop' // Placeholder
-  },
-  { 
-    id: '7', 
-    icono: '🏑', 
-    titulo: 'Hockey', 
-    detalle: '+6 años (mixto)', 
-    contacto: 'Sergio Nasso 2915754040', 
-    imagenUrl: require('../../assets/actividades/hockey_(1).jpg')
-  },
-  { 
-    id: '8', 
-    icono: '🏒', 
-    titulo: 'Hockey sobre Patines', 
-    detalle: '+5 años (mixto)', 
-    contacto: 'Guillermo 2915064363', 
-    imagenUrl: require('../../assets/actividades/hockey_sobre_patines.png')
-  },
-  { 
-    id: '9', 
-    icono: '🥊', 
-    titulo: 'Boxeo', 
-    detalle: '+7 años (mixto)', 
-    contacto: 'Gonzalo Flores 2914480251', 
-    imagenUrl: require('../../assets/actividades/boxeo.jpg')
-  },
-  { 
-    id: '10', 
-    icono: '🏀', 
-    titulo: 'Básquet Femenino', 
-    detalle: '3 a 12 años', 
-    contacto: 'Alejandra 2914133548', 
-    imagenUrl: require('../../assets/actividades/basket.jpeg')
-  },
-  { 
-    id: '11', 
-    icono: '🏀', 
-    titulo: 'Básquet Masculino', 
-    detalle: '+3 años', 
-    contacto: 'Silvio Montero 2915748545', 
-    imagenUrl: require('../../assets/actividades/basket.jpeg')
-  },
-  { 
-    id: '12', 
-    icono: '⚽', 
-    titulo: 'Futsal', 
-    detalle: '+16 años (masculino)', 
-    contacto: 'Sergio Vallejos 2914622376', 
-    imagenUrl: require('../../assets/actividades/futsal.jpg')
-  },
-  { 
-    id: '13', 
-    icono: '⚽', 
-    titulo: 'Fútbol Masculino', 
-    detalle: '+5 años', 
-    contacto: 'Matias Basualdo 2914737900', 
-    imagenUrl: require('../../assets/actividades/futbol.jpg')
-  },
-  { 
-    id: '14', 
-    icono: '⚽', 
-    titulo: 'Fútbol Femenino', 
-    detalle: '+6 años', 
-    contacto: 'Lorena Bidal 2915741716', 
-    imagenUrl: require('../../assets/actividades/futbol_femenino.jpg')
-  },
-  { 
-    id: '15', 
-    icono: '🏊', 
-    titulo: 'Natación', 
-    detalle: '+90 días (mixto)', 
-    contacto: 'Centro Deportivo 2914439070', 
-    imagenUrl: 'https://images.unsplash.com/photo-1519315901367-f34ff9154487?w=600&h=300&fit=crop' // Placeholder
-  },
-  { 
-    id: '16', 
-    icono: '💃', 
-    titulo: 'Zumba', 
-    detalle: '+14/15 años (mixto)', 
-    contacto: 'Romina Rodriguez 2914220575', 
-    imagenUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=600&h=300&fit=crop' // Placeholder
-  },
+  futbol,
+  basquet,
+  patin,
+  voley,
+  gimnasiaArtistica,
+  hockey,
+  handball,
+  hockeyPatines,
+  futsal,
+  karate,
+  boxeo,
+  newcom,
+  zumba,
 ];
 
+/* ===================== Helpers UI ===================== */
+const isPhone = (v: string) => /^[\d+\s-]{6,}$/.test(v.trim());
+const isInstagram = (v: string) => /^IG:\s*@?([\w._]+)/i.test(v.trim());
+const extractIgHandle = (v: string) => {
+  const m = v.trim().match(/^IG:\s*@?([\w._]+)/i);
+  return m ? m[1] : null;
+};
+
 export default function ActividadesScreen() {
-  const screenWidth = Dimensions.get('window').width;
-  const [imageLoading, setImageLoading] = useState<{[key: string]: boolean}>({});
+  const screenWidth = width;
+  const [imageLoading, setImageLoading] = useState<{ [key: string]: boolean }>({});
 
-  const handleImageLoadStart = (id: string) => {
-    setImageLoading(prev => ({ ...prev, [id]: true }));
-  };
+  const handleImageLoadStart = (id: string) => setImageLoading(prev => ({ ...prev, [id]: true }));
+  const handleImageLoadEnd = (id: string) => setImageLoading(prev => ({ ...prev, [id]: false }));
 
-  const handleImageLoadEnd = (id: string) => {
-    setImageLoading(prev => ({ ...prev, [id]: false }));
+  const headerCount = useMemo(() => actividadesDeportivas.length, []);
+
+  const onPressContacto = (value: string) => {
+    if (isPhone(value)) {
+      const tel = value.replace(/[^\d+]/g, '');
+      Linking.openURL(`tel:${tel}`).catch(() => {});
+    } else if (isInstagram(value)) {
+      const handle = extractIgHandle(value);
+      if (handle) {
+        Linking.openURL(`https://instagram.com/${handle}`).catch(() => {});
+      }
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.headerText}>Actividades Deportivas</Text>
       <Text style={styles.subHeaderText}>
-        Descubre todas las actividades deportivas disponibles en el club
+        Descubrí las actividades deportivas del club. ({headerCount})
       </Text>
-      
+
       <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.contentContainer}>
         {actividadesDeportivas.map(actividad => (
           <View key={actividad.id} style={[styles.card, { width: screenWidth * 0.9 }]}>
             <Image
-              source={typeof actividad.imagenUrl === 'string' 
-                ? { uri: actividad.imagenUrl } 
-                : actividad.imagenUrl}
+              source={typeof actividad.imagenUrl === 'string' ? { uri: actividad.imagenUrl } : actividad.imagenUrl}
               style={styles.image}
               onLoadStart={() => handleImageLoadStart(actividad.id)}
               onLoadEnd={() => handleImageLoadEnd(actividad.id)}
@@ -196,25 +241,50 @@ export default function ActividadesScreen() {
             {imageLoading[actividad.id] && (
               <ActivityIndicator size="large" color={COLORS.PRIMARY_GREEN} style={styles.loader} />
             )}
+
             <View style={styles.info}>
-              <Text style={styles.title}>{actividad.icono} {actividad.titulo}</Text>
+              <Text style={styles.title}>
+                {actividad.icono} {actividad.titulo}
+              </Text>
               <Text style={styles.detail}>{actividad.detalle}</Text>
-              <Text style={styles.contact}>📞 {actividad.contacto}</Text>
+
+              {/* Lugar de entrenamiento */}
+              <View style={styles.row}>
+                <Ionicons name="location-outline" size={16} color={COLORS.GRAY_MEDIUM} />
+                <Text style={styles.place}>Lugar de entrenamiento: {actividad.lugar}</Text>
+              </View>
+
+              {/* Contactos */}
+              <View style={{ marginTop: 8, gap: 6 }}>
+                {actividad.contactos.map((c, idx) => (
+                  <TouchableOpacity
+                    key={`${actividad.id}-c-${idx}`}
+                    activeOpacity={0.7}
+                    onPress={() => onPressContacto(c.value)}
+                    style={styles.row}
+                  >
+                    <Ionicons name="call-outline" size={16} color={COLORS.GRAY_MEDIUM} />
+                    <Text style={styles.contact}>
+                      {c.label}: <Text style={styles.contactValue}>{c.value}</Text>
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
           </View>
         ))}
       </ScrollView>
-      
-      {/* ChatBot flotante */}
+
       <FloatingChatBot />
     </View>
   );
 }
 
+/* ===================== Styles ===================== */
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#f5f5f5'
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
   },
   headerText: {
     fontSize: 28,
@@ -235,9 +305,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
   },
-  contentContainer: { 
+  contentContainer: {
     alignItems: 'center',
-    paddingBottom: 30
+    paddingBottom: 30,
   },
   card: {
     backgroundColor: COLORS.WHITE,
@@ -253,20 +323,27 @@ const styles = StyleSheet.create({
   image: { width: '100%', height: 180 },
   loader: { position: 'absolute', top: '40%', left: '45%' },
   info: { padding: 15 },
-  title: { 
-    fontSize: 18, 
-    fontWeight: 'bold', 
-    marginBottom: 4, 
-    color: COLORS.PRIMARY_BLACK 
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: COLORS.PRIMARY_BLACK,
   },
-  detail: { 
-    fontSize: 15, 
+  detail: {
+    fontSize: 15,
     color: '#444',
-    marginBottom: 6
+    marginBottom: 6,
   },
-  contact: { 
-    fontSize: 14, 
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  place: {
+    fontSize: 14,
     color: COLORS.GRAY_MEDIUM,
-    fontWeight: '500'
+    flexShrink: 1,
   },
+  contact: {
+    fontSize: 14,
+    color: COLORS.PRIMARY_BLACK,
+    flexShrink: 1,
+  },
+  contactValue: { color: COLORS.GRAY_MEDIUM },
 });
