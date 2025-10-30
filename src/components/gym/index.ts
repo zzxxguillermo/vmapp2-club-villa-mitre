@@ -1,6 +1,9 @@
 // Gym Components Exports
-export { ExerciseCard } from './ExerciseCard';
-export { TodayWorkoutCard } from './TodayWorkoutCard';
+export { SetCard } from './SetCard';
+export { ExerciseDetailCard } from './ExerciseDetailCard';
+export { DifficultyBadge } from './DifficultyBadge';
+export { CategoryBadge } from './CategoryBadge';
+export { WeekDayCard } from './WeekDayCard';
 
 // Re-export types for convenience
-export type { Exercise, Set, DailyWorkout, WeeklyPlan } from '../../types/gym';
+export type { Set, SetExercise, ExerciseDetails } from '../../types/gym';

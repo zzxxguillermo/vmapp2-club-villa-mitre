@@ -1,15 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react';
+// MisCuponesScreen.tsx
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Dimensions, Image,
-  ActivityIndicator, TouchableOpacity, RefreshControl
+  View, Text, StyleSheet, FlatList, Dimensions,
+  ActivityIndicator, TouchableOpacity, RefreshControl, Linking, Image
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { COLORS } from '../constants/colors';
 import { FloatingChatBot } from '../components/FloatingChatBot';
-import DetalleCuponScreen from './DetalleCuponScreen';
+
+// ===== Paleta clara (fondo blanco) =====
+const P = COLORS as Record<string, string>;
+const UI = {
+  primary: P.PRIMARY_GREEN ?? P.PRIMARY ?? '#22c55e',
+  text: '#111827',
+  textMuted: '#6b7280',
+  bg: '#ffffff',
+  card: '#ffffff',
+  border: '#e5e7eb',
+  danger: P.DANGER_RED ?? P.RED ?? '#ef4444',
+} as const;
 
 // ====== CONFIG API ======
 const API_BASE = 'https://surtekbb.com';
@@ -19,16 +30,15 @@ const TOKEN: string | null = null;
 
 // ====== Tipos ======
 type ApiPromotion = any;
-
 type Beneficio = {
   id: string;
-  titulo: string;         // (1) Título de la promo
-  comercio: string;       // (2) Nombre del comercio
-  descripcion: string;    // Texto descriptivo (se muestra más abajo)
+  titulo: string;
+  comercio: string;
+  descripcion: string;
   direccion?: string;
   telefono?: string;
   imagenUrl: string;
-  raw?: any;              // guardamos el crudo para fechas
+  raw?: any;
 };
 
 // ====== Helpers ======
@@ -92,334 +102,340 @@ const formatISOToAR = (iso?: string | null) => {
   const d = new Date(iso);
   if (isNaN(d.getTime())) return '-';
   const pad = (n: number) => String(n).padStart(2, '0');
-  const dd = pad(d.getDate());
-  const mm = pad(d.getMonth() + 1);
-  const yyyy = d.getFullYear();
-  const HH = pad(d.getHours());
-  const MM = pad(d.getMinutes());
-  return `${dd}/${mm}/${yyyy} ${HH}:${MM}`;
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
-
 const getValidoHasta = (raw?: any): string => {
-  // Prioridad: ends_at_human (si lo trae el backend), luego ends_at_iso, luego ends_at
   if (raw?.ends_at_human) return String(raw.ends_at_human);
   if (raw?.ends_at_iso) return formatISOToAR(raw.ends_at_iso);
   if (raw?.ends_at) return formatISOToAR(raw.ends_at);
   return '-';
 };
 
+// ====== UI ======
+const { width } = Dimensions.get('window');
+const CARD_H = Math.round((width * 9) / 16);
+
+// Imagen con loader
 const ImageWithLoader: React.FC<{ uri: string; style: any }> = ({ uri, style }) => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const hasUri = typeof uri === 'string' && uri.length > 0;
+
   return (
-    <View style={[style, { justifyContent: 'center', alignItems: 'center' }]}>
-      {loading && <ActivityIndicator size="large" color={COLORS.PRIMARY_GREEN} style={styles.loaderAbs} />}
-      <Image
-        source={{ uri }}
-        style={style}
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-      />
+    <View style={[style, styles.imageWrap]}>
+      {hasUri ? (
+        <>
+          {loading && (
+            <View style={styles.imageLoader}>
+              <ActivityIndicator size="small" color={UI.primary} />
+            </View>
+          )}
+          <Image
+            source={{ uri }}
+            style={style}
+            onLoadEnd={() => setLoading(false)}
+            onError={() => { setLoading(false); setError(true); }}
+          />
+        </>
+      ) : (
+        <View style={[style, styles.imagePlaceholder]}>
+          <Text style={styles.imagePlaceholderText}>Sin imagen</Text>
+        </View>
+      )}
+      {error && (
+        <View style={[style, styles.imagePlaceholder, { position: 'absolute', top: 0, left: 0 }]}>
+          <Text style={styles.imagePlaceholderText}>Error al cargar</Text>
+        </View>
+      )}
     </View>
   );
 };
 
-// ====== Data hook ======
-function usePromotions() {
+export default function MisCuponesScreen() {
+  const navigation = useNavigation<any>();
+
   const [items, setItems] = useState<Beneficio[]>([]);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState<number | null>(null);
-  const [hasMore, setHasMore] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // 🛠 FLAG de primera carga: sólo se apaga en éxito o error real, NO en abort
+  const [boot, setBoot] = useState<boolean>(true);
+
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const abortRef = useRef<AbortController | null>(null);
 
-  const fetchPage = async (p: number, replace = false) => {
-    try {
-      setLoading(true);
-      abortRef.current?.abort();
-      abortRef.current = new AbortController();
-
-      const url = `${ENDPOINT}?per_page=${PER_PAGE}&page=${p}&current=15a&order_by=starts_at&direction=desc`;
-      const res = await fetch(url, {
-        method: 'GET',
-        headers: { Accept: 'application/json', ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}) },
-        signal: abortRef.current.signal,
-      });
-
-      const text = await res.text();
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${text.slice(0, 200)}`);
-
-      const json = text ? JSON.parse(text) : {};
-      const arr: ApiPromotion[] = Array.isArray(json) ? json : (json.data ?? []);
-      const mapped = arr.map(mapApiToBeneficio);
-
-      setItems(replace ? mapped : (prev) => [...prev, ...mapped]);
-
-      const cp = json.current_page ?? p;
-      const lp = json.last_page ?? null;
-      const nextUrl: string | null | undefined = json.next_page_url ?? null;
-      setPage(cp);
-      setLastPage(lp);
-      setHasMore(Boolean(nextUrl) || (typeof lp === 'number' ? cp < lp : false));
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  const refresh = async () => {
-    setRefreshing(true);
-    setLastPage(null);
-    setHasMore(false);
-    await fetchPage(1, true);
-  };
-
-  const loadMore = async () => {
-    if (!hasMore) return;
-    const next = (page ?? 1) + 1;
-    if (lastPage && next > lastPage) return;
-    await fetchPage(next);
-  };
-
-  useEffect(() => {
-    fetchPage(1, true);
-    return () => abortRef.current?.abort();
+  const headers = useMemo(() => {
+    const h: Record<string, string> = { Accept: 'application/json' };
+    if (TOKEN) h.Authorization = `Bearer ${TOKEN}`;
+    return h;
   }, []);
 
-  return { items, loading, refreshing, refresh, loadMore, hasMore };
-}
-
-// ====== Lista estilo Beneficios ======
-const ListaBeneficios: React.FC = () => {
-  const screenWidth = Dimensions.get('window').width;
-  const navigation = useNavigation<any>();
-  const { items, loading, refreshing, refresh, loadMore, hasMore } = usePromotions();
-
-  const handleObtenerCupon = (b: Beneficio) => {
-    const cupon = {
-      id: b.id,
-      titulo: b.titulo,
-      descripcion: b.descripcion,
-      validoHasta: getValidoHasta(b.raw),
-      imagenUrl: b.imagenUrl,
-      comercio: b.comercio,
-      direccion: b.direccion,
-      telefono: b.telefono,
-      raw: b.raw,
-    };
-    navigation.navigate('DetalleCupon', { cupon });
+  const parseList = (json: any): ApiPromotion[] => {
+    if (Array.isArray(json)) return json;
+    if (Array.isArray(json?.data)) return json.data;
+    if (Array.isArray(json?.items)) return json.items;
+    if (Array.isArray(json?.results)) return json.results;
+    return [];
   };
+
+  const computeHasMore = (json: any, received: number): boolean => {
+    if (json?.meta?.current_page != null && json?.meta?.last_page != null) {
+      return Number(json.meta.current_page) < Number(json.meta.last_page);
+    }
+    if (json?.links?.next) return true;
+    return received >= PER_PAGE;
+  };
+
+  const loadPage = useCallback(
+    async (nextPage: number, replace = false) => {
+      if (loading && !(replace && nextPage === 1)) return;
+
+      setLoading(true);
+      setError(null);
+
+      abortRef.current?.abort();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+
+      try {
+        const url = `${ENDPOINT}?page=${nextPage}&per_page=${PER_PAGE}`;
+        const res = await fetch(url, { headers, signal: ctrl.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        const list = parseList(json);
+        const mapped = list.map(mapApiToBeneficio);
+
+        setItems(prev => (replace ? mapped : [...prev, ...mapped]));
+        setPage(nextPage);
+        setHasMore(computeHasMore(json, list.length));
+
+        // 🛠 Primera carga terminada con éxito
+        if (nextPage === 1) setBoot(false);
+      } catch (e: any) {
+        if (e?.name === 'AbortError') {
+          // 🛠 No tocar boot ni error en abort (evita flash de “No hay cupones”)
+          return;
+        }
+        setError(e?.message || 'Error al cargar');
+
+        // 🛠 Primera carga terminó con error real
+        if (nextPage === 1) setBoot(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [headers, loading]
+  );
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await loadPage(1, true);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadPage]);
+
+  const onEndReached = useCallback(() => {
+    if (!loading && hasMore) {
+      loadPage(page + 1);
+    }
+  }, [loading, hasMore, page, loadPage]);
+
+  useEffect(() => {
+    loadPage(1, true);
+    return () => abortRef.current?.abort();
+  }, [loadPage]);
+
+  const goToDetalle = useCallback((beneficio: Beneficio) => {
+    if (!beneficio) return;
+    navigation.navigate('DetalleCupon', { beneficio, raw: beneficio.raw, id: beneficio.id });
+  }, [navigation]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: Beneficio }) => {
+      if (!item) return null;
+      return (
+        <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => goToDetalle(item)}>
+          <ImageWithLoader uri={item.imagenUrl} style={styles.image} />
+          <View style={styles.cardBody}>
+            <Text style={styles.title} numberOfLines={2}>{item.titulo}</Text>
+
+            <View style={styles.row}>
+              <Ionicons name="storefront-outline" size={16} color={UI.textMuted} />
+              <Text style={styles.muted} numberOfLines={1}>{item.comercio}</Text>
+            </View>
+
+            {!!item.direccion && (
+              <View style={styles.row}>
+                <Ionicons name="location-outline" size={16} color={UI.textMuted} />
+                <Text style={styles.muted} numberOfLines={1}>{item.direccion}</Text>
+              </View>
+            )}
+
+            {!!item.telefono && (
+              <TouchableOpacity style={styles.row} onPress={() => Linking.openURL(`tel:${item.telefono}`)}>
+                <Ionicons name="call-outline" size={16} color={UI.textMuted} />
+                <Text style={[styles.muted, styles.link]} numberOfLines={1}>{item.telefono}</Text>
+              </TouchableOpacity>
+            )}
+
+            <Text style={styles.desc} numberOfLines={3}>{item.descripcion || '—'}</Text>
+
+            <View style={styles.footerRow}>
+              <View style={styles.badge}>
+                <Ionicons name="time-outline" size={14} color="#fff" />
+                <Text style={styles.badgeText}>Válido hasta: {getValidoHasta(item.raw)}</Text>
+              </View>
+
+              <View style={styles.ctaRow}>
+                <Text style={styles.ctaText}>Ver detalle</Text>
+                <Ionicons name="chevron-forward" size={18} color={UI.primary} />
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    },
+    [goToDetalle]
+  );
+
+  const keyExtractor = useCallback((b: Beneficio) => b.id, []);
+
+  // 🛠 Flag derivado: mientras sea la primera carga y no haya error, mostramos loader central
+  const isBooting = boot || (items.length === 0 && loading && page === 1);
+
+  const ListHeader = useMemo(() => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Mis cupones</Text>
+      <Text style={styles.headerSub}>{items.length} {items.length === 1 ? 'cupón' : 'cupones'}</Text>
+    </View>
+  ), [items.length]);
+
+  const ListFooter = useMemo(() => (
+    <View style={styles.footerWrap}>
+      {loading && <ActivityIndicator size="small" color={UI.primary} />}
+      {!loading && !hasMore && items.length > 0 && (
+        <Text style={styles.endText}>No hay más cupones</Text>
+      )}
+    </View>
+  ), [loading, hasMore, items.length]);
+
+  const Empty = useMemo(() => (
+    <View style={styles.empty}>
+      {isBooting ? (
+        <>
+          <ActivityIndicator size="large" color={UI.primary} />
+          <Text style={styles.muted}>Cargando cupones…</Text>
+        </>
+      ) : error ? (
+        <>
+          <Ionicons name="warning-outline" size={28} color={UI.danger} />
+          <Text style={styles.errorText}>Ocurrió un error: {error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => loadPage(1, true)}>
+            <Text style={styles.retryText}>Reintentar</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          <Ionicons name="ticket-outline" size={28} color={UI.textMuted} />
+          <Text style={styles.muted}>No tenés cupones disponibles.</Text>
+        </>
+      )}
+    </View>
+  ), [isBooting, error, loadPage]);
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
-        onMomentumScrollEnd={() => { if (hasMore && !loading) loadMore(); }}
-      >
-        <Text style={styles.headerText}>Red de Beneficios</Text>
-        <Text style={styles.subHeaderText}>
-          Descuentos exclusivos para socios del Club Villa Mitre
-        </Text>
-
-        {items.map((b) => (
-          <View key={b.id} style={[styles.card, { width: screenWidth * 0.9 }]}>
-            <ImageWithLoader uri={b.imagenUrl} style={styles.image} />
-
-            <View style={styles.info}>
-              {/* (1) Título de la promoción */}
-              <Text style={styles.tituloPromo} numberOfLines={2}>{b.titulo}</Text>
-
-              {/* (2) Nombre del comercio */}
-              <Text style={styles.comercio} numberOfLines={1}>{b.comercio}</Text>
-
-              {/* (3) Válido hasta: fecha formateada */}
-              <Text style={styles.validText}>
-                Válido hasta: <Text style={styles.validStrong}>{getValidoHasta(b.raw)}</Text>
-              </Text>
-
-              {/* Dirección / Teléfono */}
-              {b.direccion ? (
-                <View style={styles.contactRow}>
-                  <Ionicons name="location-outline" size={16} color={COLORS.GRAY_MEDIUM} />
-                  <Text style={styles.direccion} numberOfLines={1}>{b.direccion}</Text>
-                </View>
-              ) : null}
-
-              {b.telefono ? (
-                <View style={styles.contactRow}>
-                  <Ionicons name="call-outline" size={16} color={COLORS.GRAY_MEDIUM} />
-                  <Text style={styles.telefono} numberOfLines={1}>{b.telefono}</Text>
-                </View>
-              ) : null}
-
-              {/* Descripción (más abajo) */}
-              {b.descripcion ? (
-                <Text style={styles.descripcion} numberOfLines={4}>{b.descripcion}</Text>
-              ) : null}
-
-              <TouchableOpacity
-                style={styles.ctaButton}
-                onPress={() => handleObtenerCupon(b)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.ctaButtonContent}>
-                  <Ionicons name="pricetags-outline" size={24} color={COLORS.WHITE} />
-                  <Text style={styles.ctaButtonText}>Obtener cupón</Text>
-                </View>
-                <View style={styles.ctaButtonGlow} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-
-        {loading && items.length === 0 ? (
-          <ActivityIndicator size="large" color={COLORS.PRIMARY_GREEN} style={{ marginTop: 20 }} />
-        ) : null}
-
-        {hasMore && !loading && (
-          <TouchableOpacity style={styles.loadMoreBtn} onPress={loadMore}>
-            <Text style={styles.loadMoreText}>Cargar más</Text>
-          </TouchableOpacity>
-        )}
-
-        {!loading && items.length === 0 ? (
-          <Text style={{ color: COLORS.TEXT_SECONDARY, marginTop: 10 }}>
-            No hay promociones disponibles.
-          </Text>
-        ) : null}
-      </ScrollView>
-
+      <FlatList
+        style={styles.list}
+        data={items.filter(Boolean)}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        contentContainerStyle={items.length === 0 ? styles.ccEmpty : styles.cc}
+        ListHeaderComponent={items.length > 0 ? ListHeader : null}
+        ListFooterComponent={items.length > 0 ? ListFooter : null}
+        ListEmptyComponent={Empty}
+        onEndReachedThreshold={0.3}
+        onEndReached={onEndReached}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={UI.primary}
+            colors={[UI.primary]}
+            progressBackgroundColor="#fff"
+          />
+        }
+      />
       <FloatingChatBot />
     </View>
   );
-};
-
-// ====== Stack (asegura que exista DetalleCupon) ======
-const Stack = createNativeStackNavigator();
-
-export default function MisBeneficiosScreen() {
-  return (
-    <Stack.Navigator>
-      <Stack.Screen name="ListaBeneficios" component={ListaBeneficios} options={{ headerShown: false }} />
-      <Stack.Screen name="DetalleCupon" component={DetalleCuponScreen} options={{ title: 'Detalle del cupón' }} />
-    </Stack.Navigator>
-  );
 }
 
-// ====== Estilos ======
+// ====== Styles ======
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND_SECONDARY,
-  },
-  contentContainer: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingBottom: 100,
-  },
-  headerText: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: COLORS.TEXT_PRIMARY,
-    textAlign: 'center',
-    marginBottom: 8,
-    fontFamily: 'BarlowCondensed-Bold',
-  },
-  subHeaderText: {
-    fontSize: 16,
-    color: COLORS.TEXT_SECONDARY,
-    textAlign: 'center',
-    marginBottom: 24,
-    paddingHorizontal: 20,
-    lineHeight: 22,
-  },
+  container: { flex: 1, backgroundColor: UI.bg },
+  list: { flex: 1, backgroundColor: UI.bg },
+
+  cc: { padding: 12, paddingBottom: 24, backgroundColor: UI.bg },
+  ccEmpty: { flexGrow: 1, justifyContent: 'center', padding: 24, backgroundColor: UI.bg },
+
+  header: { paddingHorizontal: 8, paddingBottom: 8 },
+  headerTitle: { fontSize: 22, fontWeight: '700', color: UI.text },
+  headerSub: { marginTop: 2, fontSize: 14, color: UI.textMuted },
+
   card: {
-    backgroundColor: COLORS.WHITE,
-    borderRadius: 20,
-    marginVertical: 12,
+    backgroundColor: UI.card,
+    borderRadius: 14,
     overflow: 'hidden',
-    shadowColor: COLORS.PRIMARY_BLACK,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  image: { width: '100%', height: 200 },
-  loaderAbs: { position: 'absolute', top: '40%' },
-  info: { padding: 20 },
-
-  // Orden nuevo
-  tituloPromo: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: COLORS.TEXT_PRIMARY,
-    marginBottom: 4,
-    fontFamily: 'BarlowCondensed-Bold',
-  },
-  comercio: {
-    fontSize: 16,
-    color: COLORS.TEXT_SECONDARY,
-    marginBottom: 6,
-  },
-  validText: {
-    fontSize: 14,
-    color: COLORS.TEXT_SECONDARY,
     marginBottom: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: UI.border,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  validStrong: { color: COLORS.TEXT_PRIMARY, fontWeight: '600' },
+  imageWrap: { justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
+  image: { width: '100%', height: CARD_H, backgroundColor: '#f3f4f6' },
+  imageLoader: { position: 'absolute', zIndex: 1 },
+  imagePlaceholder: {
+    justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#f5f5f5', borderTopWidth: StyleSheet.hairlineWidth, borderColor: UI.border,
+  },
+  imagePlaceholderText: { color: '#6b7280', fontSize: 13 },
 
-  // Contacto
-  contactRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 6 },
-  direccion: { fontSize: 14, color: COLORS.TEXT_SECONDARY, marginLeft: 8, flex: 1 },
-  telefono: { fontSize: 14, color: COLORS.TEXT_SECONDARY, marginLeft: 8, flex: 1 },
+  cardBody: { padding: 12, gap: 6 },
+  title: { fontSize: 18, fontWeight: '700', color: UI.text },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  muted: { fontSize: 13, color: UI.textMuted, flexShrink: 1 },
+  link: { textDecorationLine: 'underline' },
+  desc: { marginTop: 6, fontSize: 14, color: UI.text },
 
-  // Descripción (más abajo)
-  descripcion: {
-    fontSize: 16,
-    color: COLORS.TEXT_PRIMARY,
-    marginTop: 8,
-    marginBottom: 16,
-    fontWeight: '600',
-    lineHeight: 22,
+  footerRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  badge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: UI.primary, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999,
   },
+  badgeText: { color: '#fff', fontSize: 12, fontWeight: '600' },
+  ctaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  ctaText: { color: UI.primary, fontWeight: '700' },
 
-  // CTA
-  ctaButton: {
-    backgroundColor: COLORS.PRIMARY_GREEN,
-    borderRadius: 16,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  ctaButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  ctaButtonText: {
-    color: COLORS.WHITE,
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 8,
-    fontFamily: 'BarlowCondensed-Bold',
-  },
-  ctaButtonGlow: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    opacity: 0,
-  },
+  footerWrap: { paddingVertical: 16, alignItems: 'center' },
+  endText: { textAlign: 'center', color: UI.textMuted, fontSize: 12 },
 
-  // Load more
-  loadMoreBtn: {
-    alignSelf: 'center',
-    backgroundColor: COLORS.PRIMARY_GREEN,
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    borderRadius: 24,
-    marginTop: 8,
+  empty: { flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: UI.bg },
+  errorText: { color: UI.danger, textAlign: 'center' },
+
+  retryBtn: {
+    marginTop: 8, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+    backgroundColor: UI.card, borderWidth: StyleSheet.hairlineWidth, borderColor: UI.border,
   },
-  loadMoreText: { color: '#fff', fontWeight: 'bold' },
+  retryText: { color: UI.text, fontWeight: '600', textAlign: 'center' },
 });

@@ -1,19 +1,31 @@
 import { useState, useEffect } from 'react';
 import { gymService } from '../services/gymService';
-import { StudentTemplatesResponse, TemplateAssignment, Professor } from '../types/gym';
+import { Assignment } from '../types/gym';
+
+interface UseStudentTemplatesParams {
+  studentId?: number; // Optional - if provided, fetches as professor; if not, fetches as student
+  autoFetch?: boolean; // Default true
+}
 
 interface UseStudentTemplatesState {
-  templates: TemplateAssignment[];
-  professor: Professor | null;
+  assignments: Assignment[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
 }
 
-export const useStudentTemplates = (): UseStudentTemplatesState => {
-  const [templates, setTemplates] = useState<TemplateAssignment[]>([]);
-  const [professor, setProfessor] = useState<Professor | null>(null);
-  const [loading, setLoading] = useState(true);
+/**
+ * Hook to fetch student assignments (templates)
+ * @param studentId - Optional. If provided, fetches as professor viewing student's assignments. If not provided, fetches current user's assignments as student.
+ * @param autoFetch - Whether to fetch automatically on mount (default: true)
+ */
+export const useStudentTemplates = (
+  params?: UseStudentTemplatesParams
+): UseStudentTemplatesState => {
+  const { studentId, autoFetch = true } = params || {};
+  
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(autoFetch);
   const [error, setError] = useState<string | null>(null);
 
   const fetchTemplates = async () => {
@@ -21,14 +33,17 @@ export const useStudentTemplates = (): UseStudentTemplatesState => {
       setLoading(true);
       setError(null);
       
-      const response = await gymService.getMyTemplates();
-      setTemplates(response.templates);
-      setProfessor(response.professor);
+      // If studentId is provided, use professor endpoint to view student's assignments
+      // Otherwise, use student endpoint to view own assignments
+      const response = studentId 
+        ? await gymService.getStudentAssignments(studentId)
+        : await gymService.getMyTemplates();
+        
+      setAssignments(response);
     } catch (err: any) {
-      console.error('Failed to fetch student templates:', err);
-      setError(err.userMessage || err.message || 'Error al cargar plantillas');
-      setTemplates([]);
-      setProfessor(null);
+      console.error('Failed to fetch student assignments:', err);
+      setError(err.message || 'Error al cargar asignaciones');
+      setAssignments([]);
     } finally {
       setLoading(false);
     }
@@ -39,12 +54,13 @@ export const useStudentTemplates = (): UseStudentTemplatesState => {
   };
 
   useEffect(() => {
-    fetchTemplates();
-  }, []);
+    if (autoFetch) {
+      fetchTemplates();
+    }
+  }, [studentId, autoFetch]);
 
   return {
-    templates,
-    professor,
+    assignments,
     loading,
     error,
     refetch

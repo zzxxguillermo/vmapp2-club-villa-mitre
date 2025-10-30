@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Text, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BackgroundImage } from '../components/BackgroundImage';
 import { Typography } from '../components/Typography';
@@ -8,6 +8,8 @@ import { FloatingChatBot } from '../components/FloatingChatBot';
 import { useAuth } from '../hooks/useAuth';
 import { COLORS } from '../constants/colors';
 import { getCardImage } from '../constants/images';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function HomeMainScreen() {
   const { user } = useAuth();
@@ -40,12 +42,24 @@ export default function HomeMainScreen() {
     <BackgroundImage screen="home" overlay={true} overlayOpacity={0.2}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
-          <Typography variant="h1" style={styles.welcomeTitle} fontFamily="BarlowCondensed-Bold">
-            ¡Hola {(user?.nombre || user?.name || 'Usuario').split(' ')[0]}!
-          </Typography>
-          <Typography variant="body" style={styles.welcomeSubtitle} fontFamily="BarlowCondensed-Regular" numberOfLines={1}>
-            Bienvenido al Club Villa Mitre
-          </Typography>
+          <View style={styles.textContainer}>
+            <Text 
+              style={styles.welcomeTitle}
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              allowFontScaling={false}
+            >
+              ¡Hola {(user?.nombre || user?.name || 'Usuario').split(' ')[0]}!
+            </Text>
+            <Text 
+              style={styles.welcomeSubtitle}
+              adjustsFontSizeToFit
+              numberOfLines={1}
+              allowFontScaling={false}
+            >
+              Bienvenido al Club Villa Mitre
+            </Text>
+          </View>
         </View>
 
 
@@ -89,20 +103,28 @@ const styles = StyleSheet.create({
     paddingVertical: 25,
     paddingHorizontal: 20,
     marginTop: 10,
+    alignItems: 'center',
+  },
+  textContainer: {
+    width: '100%',
+    maxWidth: SCREEN_WIDTH - 60,
+    alignItems: 'flex-start',
   },
   welcomeTitle: {
     color: COLORS.PRIMARY_BLACK,
-    fontSize: 48, // Ajustado para mejor proporción visual
+    fontSize: 48,
+    fontFamily: 'BarlowCondensed-Bold',
+    fontWeight: 'bold',
     marginBottom: 8,
     letterSpacing: -0.5,
-    lineHeight: 52,
+    width: '100%',
   },
   welcomeSubtitle: {
     color: COLORS.PRIMARY_BLACK,
-    fontSize: 22, // Ajustado para mantener proporción
+    fontSize: 22,
+    fontFamily: 'BarlowCondensed-Regular',
     marginTop: 0,
-    lineHeight: 26,
-    flexWrap: 'nowrap',
+    width: '100%',
   },
   sectionsContainer: {
     paddingHorizontal: 20,

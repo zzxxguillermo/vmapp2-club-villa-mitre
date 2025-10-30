@@ -72,7 +72,7 @@ export const theme = StyleSheet.create({
   // Inputs
   input: {
     borderWidth: 1,
-    borderColor: COLORS.BORDER_MEDIUM,
+    borderColor: COLORS.BORDER_LIGHT,
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -115,7 +115,7 @@ export const theme = StyleSheet.create({
   
   dividerThick: {
     height: 2,
-    backgroundColor: COLORS.BORDER_MEDIUM,
+    backgroundColor: COLORS.BORDER_DARK,
     marginVertical: 20,
   },
   

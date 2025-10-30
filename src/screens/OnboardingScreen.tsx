@@ -4,17 +4,16 @@ import {
   Text,
   StyleSheet,
   Image,
-  Dimensions,
+  useWindowDimensions,
   TouchableOpacity,
   ScrollView,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Animated,
+  Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS } from '../constants/colors';
-
-const { width, height } = Dimensions.get('window');
 
 type Slide = {
   id: number;
@@ -54,6 +53,7 @@ export default function OnboardingScreen() {
   const navigation = useNavigation();
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { width, height } = useWindowDimensions();
   
   // Animaciones
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -146,9 +146,9 @@ export default function OnboardingScreen() {
         bounces={false}
       >
         {slides.map((slide) => (
-          <View key={slide.id} style={styles.slide}>
+          <View key={slide.id} style={[styles.slide, { width, height }]}>
             {/* Imagen completa (ya tiene todos los elementos de diseño) */}
-            <Image source={slide.image} style={styles.image} resizeMode="cover" />
+            <Image source={slide.image} style={styles.image} />
             
             {/* Contenedor inferior para controles */}
             <View style={styles.controlsContainer}>
@@ -182,36 +182,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   slide: {
-    width: width,
-    height: height,
+    flex: 1,
   },
   image: {
     width: '100%',
     height: '100%',
+    resizeMode: 'cover',
   },
   controlsContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: Platform.select({ ios: 40, android: 30 }),
     left: 0,
     right: 0,
     alignItems: 'center',
-    paddingHorizontal: 30,
+    paddingHorizontal: '8%',
   },
   button: {
     backgroundColor: '#2B2B2B',
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 40,
-    borderRadius: 10,
-    marginBottom: 15,
-    width: '70%',
-    maxWidth: 280,
+    borderRadius: 12,
+    marginBottom: 16,
+    width: '85%',
+    maxWidth: 320,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 8,
   },
   buttonGreen: {
     backgroundColor: '#00D449',
@@ -220,17 +220,19 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '700',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     textTransform: 'uppercase',
     textAlign: 'center',
   },
   skipButton: {
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
   },
   skipText: {
     color: '#FFFFFF',
     fontSize: 14,
     textDecorationLine: 'underline',
     fontWeight: '400',
+    opacity: 0.9,
   },
 });

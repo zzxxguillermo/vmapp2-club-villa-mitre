@@ -10,7 +10,8 @@ import {
   ScrollView,
   Keyboard,
   TouchableWithoutFeedback,
-  TextInput
+  TextInput,
+  Text
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,6 +24,7 @@ import { Typography } from '../components/Typography';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { SocialLoginContainer } from '../components/SocialLoginButton';
+import { ForgotPasswordModal } from '../components/ForgotPasswordModal';
 import { COLORS } from '../constants/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -30,6 +32,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 export default function LoginScreen({ navigation }: Props) {
   const [dni, setDni] = useState('');
   const [password, setPassword] = useState('');
+  const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const { login, loading, error, isAuthenticated, clearAuthError } = useAuth();
   
   // Refs para navegación entre campos
@@ -121,13 +124,14 @@ export default function LoginScreen({ navigation }: Props) {
 
               <View style={styles.logoContainer}>
                 <Logo backgroundColor="light" size="xlarge" />
-                <Typography 
-                  variant="h1" 
+                <Text 
                   style={styles.title}
-                  fontFamily="BarlowCondensed-Bold"
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  allowFontScaling={false}
                 >
                   CLUB VILLA MITRE
-                </Typography>
+                </Text>
               </View>
               
               <View style={styles.formContainer}>
@@ -182,16 +186,36 @@ export default function LoginScreen({ navigation }: Props) {
                   style={styles.socialContainer}
                 /> */}
                 
-                <TouchableOpacity style={styles.registerContainer} onPress={handleRegisterPress}>
-                  <Typography style={styles.registerText}>
-                    Registrarme
-                  </Typography>
-                </TouchableOpacity>
+                <View style={styles.linksContainer}>
+                  <TouchableOpacity 
+                    style={styles.linkButton} 
+                    onPress={handleRegisterPress}
+                  >
+                    <Typography style={styles.linkText}>
+                      Registrarme
+                    </Typography>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={styles.linkButton}
+                    onPress={() => setShowForgotPasswordModal(true)}
+                  >
+                    <Typography style={styles.linkText}>
+                      ¿Olvidó su contraseña?
+                    </Typography>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+
+      {/* Modal de Olvidó Contraseña */}
+      <ForgotPasswordModal 
+        visible={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
+      />
     </BackgroundImage>
   );
 }
@@ -228,8 +252,12 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY_BLACK,
     marginTop: 20,
     textAlign: 'center',
-    letterSpacing: 2,
-    fontSize: 32, // Relativo mayor basado en 85pts vs 45pts (ratio ~1.9)
+    letterSpacing: 3,
+    fontSize: 32,
+    fontFamily: 'BarlowCondensed-Bold',
+    fontWeight: 'bold',
+    width: '100%',
+    paddingHorizontal: 10,
   },
   formContainer: {
     width: '100%',
@@ -246,14 +274,20 @@ const styles = StyleSheet.create({
   socialContainer: {
     marginTop: 16,
   },
-  registerContainer: {
+  linksContainer: {
     alignItems: 'center',
     marginTop: 24,
+    gap: 16,
   },
-  registerText: {
+  linkButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  linkText: {
     color: COLORS.WHITE,
     fontSize: 16,
     textDecorationLine: 'underline',
+    textAlign: 'center',
   },
   loader: {
     marginTop: 20,

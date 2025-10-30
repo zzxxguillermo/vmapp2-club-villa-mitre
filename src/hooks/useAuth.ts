@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from './redux';
 import { 
   loginUser, 
@@ -11,76 +11,38 @@ import {
 } from '../store/slices/authSlice';
 import { LoginRequest, RegisterRequest, SocialLoginRequest } from '../types';
 
-// Podés tiparlo mejor si tenés la interfaz real de Usuario
-type AnyUser = {
-  id?: number | string;
-  name?: string;
-  user_type?: string;
-  type_label?: string;
-  token?: string;
-  access_token?: string;
-  [k: string]: any;
-} | null;
-
-type UseAuthReturn = {
-  user: AnyUser;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
-  token: string | null; // <-- NUEVO
-  login: (credentials: LoginRequest) => any;
-  register: (userData: RegisterRequest) => any;
-  loginWithSocial: (socialData: SocialLoginRequest) => any;
-  logout: () => Promise<void>;
-  checkAuth: () => any;
-  clearAuthError: () => void;
-};
-
-export const useAuth = (): UseAuthReturn => {
+export const useAuth = () => {
   const dispatch = useAppDispatch();
+  const { user, isAuthenticated, loading, error } = useAppSelector((state) => state.auth);
 
-  // Lo tomo como any para no pelearme con el tipo del slice si no tiene 'token'
-  const authState: any = useAppSelector((state) => state.auth);
-  const { user, isAuthenticated, loading, error } = authState as {
-    user: AnyUser;
-    isAuthenticated: boolean;
-    loading: boolean;
-    error: string | null;
-  };
-
-  // Fallbacks comunes para token:
-  const token = useMemo<string | null>(() => {
-    const raw =
-      authState?.token ??
-      authState?.accessToken ??
-      (user as any)?.token ??
-      (user as any)?.access_token ??
-      null;
-    return typeof raw === 'string' ? raw : null;
-  }, [authState?.token, authState?.accessToken, user]);
-
+  // Debug para verificar el usuario actual
   if (__DEV__ && user) {
     console.log('🔐 useAuth - Usuario actual:', {
-      id: user?.id,
-      name: user?.name,
-      user_type: user?.user_type,
-      type_label: user?.type_label,
-      hasToken: !!token,
+      id: user.id,
+      name: user.name,
+      user_type: user.user_type,
+      type_label: user.type_label
     });
   }
 
   const login = useCallback(
-    (credentials: LoginRequest) => dispatch(loginUser(credentials)),
+    (credentials: LoginRequest) => {
+      return dispatch(loginUser(credentials));
+    },
     [dispatch]
   );
 
   const register = useCallback(
-    (userData: RegisterRequest) => dispatch(registerUser(userData)),
+    (userData: RegisterRequest) => {
+      return dispatch(registerUser(userData));
+    },
     [dispatch]
   );
 
   const loginWithSocial = useCallback(
-    (socialData: SocialLoginRequest) => dispatch(socialLogin(socialData)),
+    (socialData: SocialLoginRequest) => {
+      return dispatch(socialLogin(socialData));
+    },
     [dispatch]
   );
 
@@ -95,7 +57,16 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [dispatch]);
 
-  const checkAuth = useCallback(() => dispatch(getCurrentUser()), [dispatch]);
+  const checkAuth = useCallback(() => {
+    return dispatch(getCurrentUser());
+  }, [dispatch]);
+
+  // const promote = useCallback(
+  //   (userId: number) => {
+  //     return dispatch(promoteUser(userId));
+  //   },
+  //   [dispatch]
+  // );
 
   const clearAuthError = useCallback(() => {
     dispatch(clearError());
@@ -106,7 +77,6 @@ export const useAuth = (): UseAuthReturn => {
     isAuthenticated,
     loading,
     error,
-    token,              // <-- lo exponemos
     login,
     register,
     loginWithSocial,

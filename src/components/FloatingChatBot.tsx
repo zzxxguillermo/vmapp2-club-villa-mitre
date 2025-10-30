@@ -131,7 +131,7 @@ export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
           activeOpacity={0.8}
         >
           <Image
-            source={require('../../assets/BOTVM.png')}
+            source={require('../../assets/logo-chatbot.png')}
             style={styles.botImage}
             resizeMode="contain"
           />

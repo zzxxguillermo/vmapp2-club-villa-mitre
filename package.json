@@ -25,7 +25,6 @@
     "expo": "~53.0.23",
     "expo-build-properties": "~0.14.8",
     "expo-font": "^13.3.2",
-    "expo-image": "~2.4.1",
     "expo-linear-gradient": "~14.1.5",
     "expo-status-bar": "~2.2.3",
     "lodash": "^4.17.21",
@@ -48,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@expo/config-plugins": "^54.0.2",
     "@types/jest": "^29.5.12",
     "@types/node": "^24.6.2",
     "@types/react": "~19.0.10",

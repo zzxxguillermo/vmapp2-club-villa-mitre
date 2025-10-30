@@ -27,7 +27,7 @@ const centroDeportivoOptions: CentroDeportivoOption[] = [
     title: 'Gimnasio',
     description: 'Equipamiento, rutinas y entrenamiento personalizado',
     icon: 'fitness-outline',
-    screen: 'GymDashboard'
+    screen: 'Gimnasio'
   },
   {
     id: '3',
@@ -50,7 +50,7 @@ export default function CentroDeportivoScreen() {
     }
 
     // Verificar si es el gimnasio y el usuario es local
-    if (option.screen === 'GymDashboard' && user?.user_type === 'local') {
+    if (option.screen === 'Gimnasio' && user?.user_type === 'local') {
       Alert.alert(
         'Acceso Restringido',
         'Para acceder al gimnasio necesitas ser socio del club. Contacta con administración para más información.',
