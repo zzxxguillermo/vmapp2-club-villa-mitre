@@ -18,21 +18,24 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const getCardStyle = (): ViewStyle => {
     const baseStyle = variant === 'green' ? theme.cardGreen : theme.card;
-    
+
     const paddingStyle = {
       none: { padding: 0 },
       small: { padding: 8 },
       medium: { padding: 16 },
       large: { padding: 24 },
     }[padding];
-    
-    const elevationStyle = variant === 'elevated' ? {
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 8,
-      elevation: 6,
-    } : {};
-    
+
+    const elevationStyle =
+      variant === 'elevated'
+        ? {
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 8,
+            elevation: 6,
+          }
+        : {};
+
     return {
       ...baseStyle,
       ...paddingStyle,

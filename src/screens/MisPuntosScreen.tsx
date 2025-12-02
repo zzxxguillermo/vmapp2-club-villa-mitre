@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
-} from "react-native";
-import { PieChart, BarChart, LineChart } from "react-native-chart-kit";
+} from 'react-native';
+import { PieChart, BarChart, LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { FloatingChatBot } from '../components/FloatingChatBot';
@@ -26,21 +26,21 @@ export default function MisPuntosScreen() {
   // Datos más realistas y detallados para el gráfico circular
   const pieData = [
     {
-      name: "Disponibles",
+      name: 'Disponibles',
       population: puntosDisponibles,
       color: COLORS.PRIMARY_GREEN,
       legendFontColor: COLORS.TEXT_PRIMARY,
       legendFontSize: 16,
     },
     {
-      name: "Gastados",
+      name: 'Gastados',
       population: puntosGastados,
       color: COLORS.WARNING,
       legendFontColor: COLORS.TEXT_PRIMARY,
       legendFontSize: 16,
     },
     {
-      name: "Por Vencer",
+      name: 'Por Vencer',
       population: 200,
       color: COLORS.ERROR,
       legendFontColor: COLORS.TEXT_PRIMARY,
@@ -50,25 +50,25 @@ export default function MisPuntosScreen() {
 
   // Datos más detallados para el gráfico de barras (últimos 12 meses)
   const barData = {
-    labels: ["Jul", "Ago", "Sep", "Oct", "Nov", "Dic", "Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+    labels: ['Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
     datasets: [
       {
         data: [150, 280, 320, 180, 450, 380, 200, 300, 250, 400, 350, 300],
         color: (opacity = 1) => `rgba(0, 151, 61, ${opacity})`, // Verde del club
         strokeWidth: 3,
-      }
+      },
     ],
   };
 
   // Datos para gráfico de líneas (tendencia de puntos acumulados)
   const lineData = {
-    labels: ["Jul", "Ago", "Sep", "Oct", "Nov", "Dic", "Ene", "Feb", "Mar", "Abr", "May", "Jun"],
+    labels: ['Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
     datasets: [
       {
         data: [800, 920, 1100, 980, 1200, 1350, 1200, 1300, 1250, 1400, 1350, 1200],
         color: (opacity = 1) => `rgba(0, 151, 61, ${opacity})`,
         strokeWidth: 4,
-      }
+      },
     ],
   };
 
@@ -84,9 +84,7 @@ export default function MisPuntosScreen() {
           />
           <View style={styles.headerOverlay}>
             <Text style={styles.headerTitle}>MIS PUNTOS</Text>
-            <Text style={styles.headerSubtitle}>
-              Gestiona y canjea tus puntos del club
-            </Text>
+            <Text style={styles.headerSubtitle}>Gestiona y canjea tus puntos del club</Text>
           </View>
         </View>
 
@@ -111,9 +109,9 @@ export default function MisPuntosScreen() {
               width={width * 0.85}
               height={220}
               chartConfig={chartConfig}
-              accessor={"population"}
-              backgroundColor={"transparent"}
-              paddingLeft={"15"}
+              accessor={'population'}
+              backgroundColor={'transparent'}
+              paddingLeft={'15'}
               absolute
             />
           </View>
@@ -188,21 +186,19 @@ export default function MisPuntosScreen() {
         {/* Opciones de uso */}
         <View style={styles.actionsSection}>
           <Text style={styles.actionsTitle}>¿Qué hacer con mis puntos?</Text>
-          
+
           <TouchableOpacity style={styles.actionButton}>
             <View style={styles.actionButtonContent}>
               <Ionicons name="gift-outline" size={28} color={COLORS.WHITE} />
               <View style={styles.actionButtonText}>
                 <Text style={styles.actionButtonTitle}>Canjear Beneficios</Text>
-                <Text style={styles.actionButtonSubtitle}>
-                  Descuentos y promociones exclusivas
-                </Text>
+                <Text style={styles.actionButtonSubtitle}>Descuentos y promociones exclusivas</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.WHITE} />
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: COLORS.INFO }]}
             onPress={() => (navigation as any).navigate('MisBeneficios')}
           >
@@ -223,16 +219,14 @@ export default function MisPuntosScreen() {
               <Ionicons name="analytics-outline" size={28} color={COLORS.WHITE} />
               <View style={styles.actionButtonText}>
                 <Text style={styles.actionButtonTitle}>Ver Más Detalles</Text>
-                <Text style={styles.actionButtonSubtitle}>
-                  Historial completo y estadísticas
-                </Text>
+                <Text style={styles.actionButtonSubtitle}>Historial completo y estadísticas</Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.WHITE} />
             </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
-      
+
       {/* ChatBot flotante */}
       <FloatingChatBot />
     </View>
@@ -240,18 +234,18 @@ export default function MisPuntosScreen() {
 }
 
 const chartConfig = {
-  backgroundColor: "#fff",
-  backgroundGradientFrom: "#fff",
-  backgroundGradientTo: "#fff",
+  backgroundColor: COLORS.WHITE,
+  backgroundGradientFrom: COLORS.WHITE,
+  backgroundGradientTo: COLORS.WHITE,
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
 };
 
 const enhancedChartConfig = {
-  backgroundColor: "#fff",
-  backgroundGradientFrom: "#fff",
-  backgroundGradientTo: "#fff",
+  backgroundColor: COLORS.WHITE,
+  backgroundGradientFrom: COLORS.WHITE,
+  backgroundGradientTo: COLORS.WHITE,
   decimalPlaces: 0,
   color: (opacity = 1) => `rgba(0, 151, 61, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(29, 29, 27, ${opacity})`,
@@ -259,12 +253,12 @@ const enhancedChartConfig = {
   barPercentage: 0.7,
   useShadowColorFromDataset: false,
   propsForDots: {
-    r: "6",
-    strokeWidth: "3",
+    r: '6',
+    strokeWidth: '3',
     stroke: COLORS.PRIMARY_GREEN,
   },
   propsForBackgroundLines: {
-    strokeDasharray: "",
+    strokeDasharray: '',
     stroke: COLORS.GRAY_LIGHT,
     strokeWidth: 1,
   },

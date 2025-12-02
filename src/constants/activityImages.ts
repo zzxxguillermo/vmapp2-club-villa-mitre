@@ -17,7 +17,7 @@ export const ACTIVITY_IMAGES = {
 // Función para obtener imagen por nombre de actividad
 export const getActivityImage = (activityName: string) => {
   const normalizedName = activityName.toLowerCase().replace(/\s+/g, '_');
-  
+
   switch (normalizedName) {
     case 'basket':
     case 'basquet':

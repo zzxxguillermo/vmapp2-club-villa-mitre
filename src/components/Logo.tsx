@@ -14,7 +14,7 @@ export const Logo: React.FC<LogoProps> = ({
   ...props
 }) => {
   const logoSource = getLogoForBackground(backgroundColor);
-  
+
   const getSizeStyle = (): ImageStyle => {
     const sizes = {
       small: { width: 40, height: 40 },
@@ -22,18 +22,12 @@ export const Logo: React.FC<LogoProps> = ({
       large: { width: 80, height: 80 },
       xlarge: { width: 120, height: 120 },
     };
-    
+
     return {
       ...sizes[size],
       resizeMode: 'contain',
     };
   };
 
-  return (
-    <Image
-      source={logoSource}
-      style={[getSizeStyle(), style]}
-      {...props}
-    />
-  );
+  return <Image source={logoSource} style={[getSizeStyle(), style]} {...props} />;
 };

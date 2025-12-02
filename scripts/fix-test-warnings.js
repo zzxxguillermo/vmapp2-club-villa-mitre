@@ -13,17 +13,17 @@ const testFiles = [
   // Tests de componentes
   'src/__tests__/components/gym/ExerciseCard.test.tsx',
   'src/__tests__/components/gym/TodayWorkoutCard.test.tsx',
-  
+
   // Tests de integración
   'src/__tests__/integration/authFlow.test.ts',
   'src/__tests__/integration/gymEdgeCases.test.ts',
   'src/__tests__/integration/gymFlow.test.ts',
   'src/__tests__/integration/userJourney.test.ts',
-  
+
   // Tests de pantallas
   'src/__tests__/screens/gym/DailyWorkoutScreen.test.tsx',
   'src/__tests__/screens/HomeMainScreen.test.tsx',
-  
+
   // Tests de servicios (originales, no los simplificados)
   'src/__tests__/services/authService.test.ts',
   'src/__tests__/services/gymService.test.ts',
@@ -31,14 +31,14 @@ const testFiles = [
 ];
 
 console.log('🔧 APLICANDO @ts-nocheck A ARCHIVOS DE TEST');
-console.log('=' .repeat(50));
+console.log('='.repeat(50));
 
 let processedFiles = 0;
 let skippedFiles = 0;
 
-testFiles.forEach(filePath => {
+testFiles.forEach((filePath) => {
   const fullPath = path.join(process.cwd(), filePath);
-  
+
   try {
     // Verificar si el archivo existe
     if (!fs.existsSync(fullPath)) {
@@ -46,26 +46,25 @@ testFiles.forEach(filePath => {
       skippedFiles++;
       return;
     }
-    
+
     // Leer el contenido del archivo
     const content = fs.readFileSync(fullPath, 'utf8');
-    
+
     // Verificar si ya tiene @ts-nocheck
     if (content.startsWith('// @ts-nocheck')) {
       console.log(`✅ Ya tiene @ts-nocheck: ${filePath}`);
       skippedFiles++;
       return;
     }
-    
+
     // Agregar @ts-nocheck al inicio
     const newContent = `// @ts-nocheck\n${content}`;
-    
+
     // Escribir el archivo actualizado
     fs.writeFileSync(fullPath, newContent, 'utf8');
-    
+
     console.log(`✅ Aplicado @ts-nocheck: ${filePath}`);
     processedFiles++;
-    
   } catch (error) {
     console.log(`❌ Error procesando ${filePath}: ${error.message}`);
   }

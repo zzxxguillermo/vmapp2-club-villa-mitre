@@ -11,7 +11,6 @@ export default function MiRutinaScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-        
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Mi Rutina</Text>
@@ -53,7 +52,7 @@ export default function MiRutinaScreen() {
         {/* Entrenamientos de la semana */}
         <View style={styles.workoutsCard}>
           <Text style={styles.cardTitle}>Entrenamientos de la Semana</Text>
-          
+
           <View style={styles.workoutItem}>
             <View style={styles.workoutDay}>
               <Text style={styles.dayText}>LUN</Text>
@@ -116,13 +115,12 @@ export default function MiRutinaScreen() {
         <View style={styles.infoCard}>
           <Text style={styles.infoTitle}>Próxima Evaluación</Text>
           <Text style={styles.infoText}>
-            Tu próxima evaluación física está programada para el 25 de enero. 
-            Nuestros profesores analizarán tu progreso y ajustarán tu rutina según tus objetivos.
+            Tu próxima evaluación física está programada para el 25 de enero. Nuestros profesores
+            analizarán tu progreso y ajustarán tu rutina según tus objetivos.
           </Text>
         </View>
-
       </ScrollView>
-      
+
       <FloatingChatBot />
     </View>
   );

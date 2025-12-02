@@ -3,9 +3,8 @@ import { Platform, View, Text, StyleSheet, ActivityIndicator } from 'react-nativ
 
 // Use a standard dynamic import for web, and a direct require for native
 // This avoids Suspense issues on native and fixes the web bundling error.
-const MapComponent = Platform.OS === 'web'
-  ? React.lazy(() => import('./MapWeb'))
-  : require('./MapNative').default;
+const MapComponent =
+  Platform.OS === 'web' ? React.lazy(() => import('./MapWeb')) : require('./MapNative').default;
 
 type Local = {
   id: string;

@@ -11,7 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScreenContainer } from '../components/ScreenContainer';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/hooks/useAuth';
 import { COLORS } from '../constants/colors';
 import { FloatingChatBot } from '../components/FloatingChatBot';
 
@@ -24,7 +24,7 @@ export default function EstadoDeCuentaScreen() {
     if (semaforo === undefined || semaforo === null) {
       return { alDia: false, texto: 'Sin información', color: COLORS.TEXT_SECONDARY };
     }
-    
+
     switch (semaforo) {
       case 1:
         return { alDia: true, texto: 'Al día', color: COLORS.SUCCESS };
@@ -42,7 +42,7 @@ export default function EstadoDeCuentaScreen() {
     if (!monto && monto !== 0) return 'N/A';
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'ARS'
+      currency: 'ARS',
     }).format(monto);
   };
 
@@ -74,7 +74,6 @@ export default function EstadoDeCuentaScreen() {
   return (
     <ScreenContainer>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        
         {/* Header Principal Mejorado */}
         <View style={styles.headerGradient}>
           <View style={styles.headerContent}>
@@ -109,14 +108,34 @@ export default function EstadoDeCuentaScreen() {
           </View>
           <View style={styles.balanceContent}>
             <Text style={styles.balanceLabel}>Saldo de Cuenta</Text>
-            <Text style={[styles.balanceAmount, { 
-              color: (user?.saldo ?? 0) === 0 ? COLORS.TEXT_PRIMARY : ((user?.saldo ?? 0) > 0 ? COLORS.PRIMARY_GREEN : COLORS.ERROR)
-            }]}>
+            <Text
+              style={[
+                styles.balanceAmount,
+                {
+                  color:
+                    (user?.saldo ?? 0) === 0
+                      ? COLORS.TEXT_PRIMARY
+                      : (user?.saldo ?? 0) > 0
+                        ? COLORS.PRIMARY_GREEN
+                        : COLORS.ERROR,
+                },
+              ]}
+            >
               ${Math.abs(user?.saldo ?? 0).toLocaleString('es-AR')}
             </Text>
-            <View style={[styles.balanceIndicator, { 
-              backgroundColor: (user?.saldo ?? 0) === 0 ? COLORS.TEXT_PRIMARY : ((user?.saldo ?? 0) > 0 ? COLORS.PRIMARY_GREEN : COLORS.ERROR)
-            }]} />
+            <View
+              style={[
+                styles.balanceIndicator,
+                {
+                  backgroundColor:
+                    (user?.saldo ?? 0) === 0
+                      ? COLORS.TEXT_PRIMARY
+                      : (user?.saldo ?? 0) > 0
+                        ? COLORS.PRIMARY_GREEN
+                        : COLORS.ERROR,
+                },
+              ]}
+            />
           </View>
         </View>
 
@@ -193,7 +212,6 @@ export default function EstadoDeCuentaScreen() {
             <Text style={styles.paymentLabel}>No hay historial de pagos disponible</Text>
           )}
         </View> */}
-
       </ScrollView>
       <FloatingChatBot />
     </ScreenContainer>

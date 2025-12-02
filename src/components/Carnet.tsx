@@ -48,7 +48,9 @@ export default function CarnetFit({
     const scale = Math.min(maxWidth / DESIGN_W, maxHeight / DESIGN_H);
     return (
       <View style={[styles.outer, { width: DESIGN_W * scale, height: DESIGN_H * scale }]}>
-        <View style={[styles.cardShadow, { width: DESIGN_W, height: DESIGN_H, transform: [{ scale }] }]}>
+        <View
+          style={[styles.cardShadow, { width: DESIGN_W, height: DESIGN_H, transform: [{ scale }] }]}
+        >
           <CardInner
             nombre={nombre}
             apellido={apellido}
@@ -92,9 +94,22 @@ export default function CarnetFit({
 
 /* ----- UI interna de la tarjeta (vertical de diseño) ----- */
 function CardInner({
-  nombre, apellido, dni, nroSocio, fotoUrl, validoHasta, barcodeVal,
-}: { nombre: string; apellido: string; dni: string; nroSocio: string; fotoUrl: string; validoHasta: string; barcodeVal: string; }) {
-  
+  nombre,
+  apellido,
+  dni,
+  nroSocio,
+  fotoUrl,
+  validoHasta,
+  barcodeVal,
+}: {
+  nombre: string;
+  apellido: string;
+  dni: string;
+  nroSocio: string;
+  fotoUrl: string;
+  validoHasta: string;
+  barcodeVal: string;
+}) {
   // ========================================
   // 📸 MANEJO DE ERROR DE CARGA DE IMAGEN
   // ========================================
@@ -102,30 +117,27 @@ function CardInner({
   // Si falla, mostramos un placeholder con ícono
   // ========================================
   const [imageError, setImageError] = useState(false);
-  
+
   // Placeholder URL - imagen genérica de avatar
-  const PLACEHOLDER_IMAGE = "https://ui-avatars.com/api/?name=" + 
-    encodeURIComponent(nombre + "+" + apellido) + 
-    "&background=00973D&color=fff&size=400&bold=true";
+  const PLACEHOLDER_IMAGE =
+    'https://ui-avatars.com/api/?name=' +
+    encodeURIComponent(nombre + '+' + apellido) +
+    '&background=00973D&color=fff&size=400&bold=true';
 
   return (
     <View style={styles.card}>
       {/* Barra de marca con logo local */}
       <View style={styles.brandBar}>
-        <Logo 
-          backgroundColor="dark" 
-          size="small"
-          style={styles.brandLogo}
-        />
+        <Logo backgroundColor="dark" size="small" style={styles.brandLogo} />
         <Text style={styles.brandText}>CLUB VILLA MITRE</Text>
       </View>
 
       {/* Foto + datos */}
       <View style={styles.row}>
         {!imageError ? (
-          <Image 
-            source={{ uri: fotoUrl }} 
-            style={styles.photo} 
+          <Image
+            source={{ uri: fotoUrl }}
+            style={styles.photo}
             resizeMode="cover"
             onLoad={() => {
               if (__DEV__) {
@@ -146,15 +158,13 @@ function CardInner({
         ) : (
           // Fallback: Mostrar placeholder con iniciales
           <View style={[styles.photo, styles.photoPlaceholder]}>
-            <Image 
-              source={{ uri: PLACEHOLDER_IMAGE }}
-              style={styles.photo}
-              resizeMode="cover"
-            />
+            <Image source={{ uri: PLACEHOLDER_IMAGE }} style={styles.photo} resizeMode="cover" />
           </View>
         )}
         <View style={styles.info}>
-          <Text style={styles.name} numberOfLines={2}>{nombre} {apellido}</Text>
+          <Text style={styles.name} numberOfLines={2}>
+            {nombre} {apellido}
+          </Text>
           <Text style={styles.nroSocio}>Nro Socio: {nroSocio}</Text>
           <Text style={styles.dni}>DNI: {dni}</Text>
         </View>
@@ -233,8 +243,12 @@ const styles = StyleSheet.create({
 
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 14 },
   photo: {
-    width: 180, height: 220, borderRadius: 14,
-    borderColor: '#FFFFFF', borderWidth: 3, backgroundColor: '#123',
+    width: 180,
+    height: 220,
+    borderRadius: 14,
+    borderColor: '#FFFFFF',
+    borderWidth: 3,
+    backgroundColor: '#123',
   },
   photoPlaceholder: {
     backgroundColor: '#E6EBE8',
@@ -264,8 +278,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '90%',
   },
-  barcodeImgLarge: { 
-    width: '100%', 
+  barcodeImgLarge: {
+    width: '100%',
     height: 80,
   },
   barcodeNumberLarge: {
@@ -292,9 +306,9 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
   },
-  qrCodeLarge: { 
-    width: '100%', 
-    height: '100%' 
+  qrCodeLarge: {
+    width: '100%',
+    height: '100%',
   },
 
   // Estilos antiguos mantenidos para compatibilidad
@@ -315,12 +329,18 @@ const styles = StyleSheet.create({
   qrCode: { width: '100%', height: '100%' },
   qrCaptionWrap: {
     position: 'absolute',
-    bottom: 6, left: 0, right: 0,
+    bottom: 6,
+    left: 0,
+    right: 0,
     alignItems: 'center',
   },
   qrCaption: {
-    color: '#1E2A20', fontSize: 12, opacity: 0.85,
-    backgroundColor: 'rgba(255,255,255,0.75)', paddingHorizontal: 6, borderRadius: 6,
+    color: '#1E2A20',
+    fontSize: 12,
+    opacity: 0.85,
+    backgroundColor: 'rgba(255,255,255,0.75)',
+    paddingHorizontal: 6,
+    borderRadius: 6,
   },
 
   barcodeSide: { flex: 1, justifyContent: 'center' },

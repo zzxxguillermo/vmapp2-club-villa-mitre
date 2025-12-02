@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/cvm-escudo-para-fondo-blanco.png",
     "userInterfaceStyle": "light",
+    "jsEngine": "hermes",
     "platforms": [
       "ios",
       "android"

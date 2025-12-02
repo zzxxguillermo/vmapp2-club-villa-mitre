@@ -15,7 +15,7 @@ const checkServer = (host, port, path = '') => {
       port: port,
       path: path,
       method: 'GET',
-      timeout: 5000
+      timeout: 5000,
     };
 
     const req = http.request(options, (res) => {
@@ -27,7 +27,7 @@ const checkServer = (host, port, path = '') => {
         resolve({
           status: res.statusCode,
           data: data,
-          headers: res.headers
+          headers: res.headers,
         });
       });
     });
@@ -55,7 +55,7 @@ async function checkLaravelServer() {
     try {
       console.log(`Verificando ${server.name}...`);
       const response = await checkServer(server.host, server.port, server.path);
-      
+
       if (response.status === 200) {
         console.log(`✅ ${server.name} - FUNCIONANDO (${response.status})`);
         if (server.path === '/api/health') {
@@ -75,7 +75,7 @@ async function checkLaravelServer() {
     } catch (error) {
       console.log(`❌ ${server.name} - NO DISPONIBLE`);
       console.log(`   Error: ${error.message}`);
-      
+
       if (error.code === 'ECONNREFUSED') {
         console.log(`   💡 Solución: Ejecutar "php artisan serve --host=0.0.0.0 --port=8000"`);
       }
@@ -85,12 +85,14 @@ async function checkLaravelServer() {
 }
 
 console.log('🚀 Iniciando verificación...\n');
-checkLaravelServer().then(() => {
-  console.log('✅ Verificación completada');
-  console.log('\n🔧 Si el servidor no está corriendo:');
-  console.log('1. cd /ruta/al/proyecto/laravel');
-  console.log('2. php artisan serve --host=0.0.0.0 --port=8000');
-  console.log('3. Verificar que responda en http://localhost:8000');
-}).catch((error) => {
-  console.error('❌ Error durante la verificación:', error);
-});
+checkLaravelServer()
+  .then(() => {
+    console.log('✅ Verificación completada');
+    console.log('\n🔧 Si el servidor no está corriendo:');
+    console.log('1. cd /ruta/al/proyecto/laravel');
+    console.log('2. php artisan serve --host=0.0.0.0 --port=8000');
+    console.log('3. Verificar que responda en http://localhost:8000');
+  })
+  .catch((error) => {
+    console.error('❌ Error durante la verificación:', error);
+  });

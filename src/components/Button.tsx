@@ -21,18 +21,19 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const getButtonStyle = (): ViewStyle => {
-    const baseStyle = variant === 'primary' 
-      ? theme.buttonPrimary 
-      : variant === 'secondary' 
-      ? theme.buttonSecondary 
-      : theme.buttonDark;
-    
+    const baseStyle =
+      variant === 'primary'
+        ? theme.buttonPrimary
+        : variant === 'secondary'
+          ? theme.buttonSecondary
+          : theme.buttonDark;
+
     const sizeStyle = {
       small: { paddingVertical: 8, paddingHorizontal: 16 },
       medium: { paddingVertical: 12, paddingHorizontal: 24 },
       large: { paddingVertical: 16, paddingHorizontal: 32 },
     }[size];
-    
+
     return {
       ...baseStyle,
       ...sizeStyle,
@@ -42,16 +43,14 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   const getTextStyle = (): TextStyle => {
-    const color = variant === 'primary' || variant === 'dark' 
-      ? COLORS.WHITE 
-      : COLORS.PRIMARY_GREEN;
-    
+    const color = variant === 'primary' || variant === 'dark' ? COLORS.WHITE : COLORS.PRIMARY_GREEN;
+
     const fontSize = {
       small: 14,
       medium: 16,
       large: 18,
     }[size];
-    
+
     return {
       color,
       fontSize,
@@ -61,14 +60,8 @@ export const Button: React.FC<ButtonProps> = ({
   };
 
   return (
-    <TouchableOpacity
-      style={[getButtonStyle(), style]}
-      disabled={disabled}
-      {...props}
-    >
-      <Typography style={getTextStyle()}>
-        {title}
-      </Typography>
+    <TouchableOpacity style={[getButtonStyle(), style]} disabled={disabled} {...props}>
+      <Typography style={getTextStyle()}>{title}</Typography>
     </TouchableOpacity>
   );
 };

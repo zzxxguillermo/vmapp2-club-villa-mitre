@@ -2,9 +2,14 @@ import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ActivityIndicator, View } from 'react-native';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { store, persistor } from '../store';
 import { makeServer } from '../mirage/server';
-import { shouldUseMirageServer, logEnvironmentConfig, testApiConnectivity } from '../utils/environment';
+import {
+  shouldUseMirageServer,
+  logEnvironmentConfig,
+  testApiConnectivity,
+} from '../utils/environment';
 
 // Singleton pattern to ensure Mirage only initializes once
 let mirageServer: any = null;
@@ -23,7 +28,7 @@ const initializeMirage = () => {
   console.log('🚀 AppProvider: Initializing Mirage.js server (singleton)...');
   logEnvironmentConfig();
   console.log('🔧 AppProvider: Proceeding with Mirage setup');
-  
+
   try {
     console.log('🔧 AppProvider: About to call makeServer...');
     mirageServer = makeServer({ environment: 'development' });
@@ -36,6 +41,16 @@ const initializeMirage = () => {
     console.error('💥 AppProvider: Error details:', error);
   }
 };
+
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 interface AppProviderProps {
   children: React.ReactNode;
@@ -51,11 +66,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   useEffect(() => {
     // Initialize Mirage on component mount
     initializeMirage();
-    
+
     // Test API connectivity if not using Mirage
     if (!shouldUseMirageServer()) {
       console.log('🔍 Running connectivity test...');
-      testApiConnectivity().catch(error => {
+      testApiConnectivity().catch((error) => {
         console.error('🚨 Connectivity test failed during app initialization:', error);
       });
     }
@@ -64,7 +79,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <Provider store={store}>
       <PersistGate loading={<LoadingScreen />} persistor={persistor}>
-        {children}
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
       </PersistGate>
     </Provider>
   );

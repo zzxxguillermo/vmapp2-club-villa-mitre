@@ -102,13 +102,13 @@ export class PromotionService {
       const response = await this.checkDNI(dni);
       return {
         valid: response.data.exists && response.data.valid,
-        message: response.data.message
+        message: response.data.message,
       };
     } catch (error) {
       // Manejo de errores de conectividad externa
       return {
         valid: false,
-        message: 'Error de conectividad con el sistema del club. Intenta más tarde.'
+        message: 'Error de conectividad con el sistema del club. Intenta más tarde.',
       };
     }
   }
@@ -117,9 +117,9 @@ export class PromotionService {
    * Flujo completo de solicitud de promoción
    */
   async submitPromotionRequest(
-    dni: string, 
-    reason: string, 
-    clubPassword: string, 
+    dni: string,
+    reason: string,
+    clubPassword: string,
     additionalInfo?: string
   ): Promise<{
     success: boolean;
@@ -132,7 +132,7 @@ export class PromotionService {
       if (!eligibilityResponse.data.eligible || !eligibilityResponse.data.can_request) {
         return {
           success: false,
-          message: eligibilityResponse.data.reason || 'No eres elegible para promoción'
+          message: eligibilityResponse.data.reason || 'No eres elegible para promoción',
         };
       }
 
@@ -141,7 +141,7 @@ export class PromotionService {
       if (!dniCheck.valid) {
         return {
           success: false,
-          message: dniCheck.message
+          message: dniCheck.message,
         };
       }
 
@@ -149,21 +149,20 @@ export class PromotionService {
       const promotionRequest: PromotionRequest = {
         reason,
         additional_info: additionalInfo,
-        club_password: clubPassword
+        club_password: clubPassword,
       };
 
       const response = await this.requestPromotion(promotionRequest);
-      
+
       return {
         success: response.data.success,
         message: response.data.message,
-        promotionId: response.data.promotion_id
+        promotionId: response.data.promotion_id,
       };
-
     } catch (error: any) {
       return {
         success: false,
-        message: error.message || 'Error al procesar la solicitud de promoción'
+        message: error.message || 'Error al procesar la solicitud de promoción',
       };
     }
   }

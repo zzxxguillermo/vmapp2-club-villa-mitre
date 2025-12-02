@@ -1,4 +1,3 @@
-
 // ===== INTERFACES PRINCIPALES =====
 
 // Estado de cuenta del socio
@@ -24,18 +23,18 @@ export interface HistorialPago {
 export interface Usuario {
   id: number;
   dni: string;
-  user_type: "local" | "api";
+  user_type: 'local' | 'api';
   type_label?: string;
   name: string;
   display_name: string;
   email: string | null;
   phone: string | null;
-  promotion_status: "none" | "pending" | "approved" | "rejected";
+  promotion_status: 'none' | 'pending' | 'approved' | 'rejected';
   promotion_label: string;
   promoted_at: string | null;
   can_promote: boolean;
   is_complete: boolean;
-  
+
   // Campos específicos de socios (solo para user_type: "api")
   nombre?: string;
   apellido?: string;
@@ -52,15 +51,15 @@ export interface Usuario {
   barcode?: string;
   estado_socio?: string;
   api_updated_at?: string;
-  
+
   // Nuevos campos de la API de terceros
   saldo?: number;
   semaforo?: number; // 1 = Al día, 99 = Con deuda exigible, 10 = Con deuda no exigible
   foto_url?: string;
-  
+
   created_at: string;
   updated_at: string;
-  
+
   // Campos legacy para compatibilidad con componentes existentes
   fotoUrl?: string;
   profileImage?: string;

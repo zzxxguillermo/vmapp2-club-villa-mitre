@@ -34,21 +34,11 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   if (useBackground && screen) {
     return (
-      <BackgroundImage 
-        screen={screen} 
-        overlay={backgroundOverlay}
-        style={containerStyle}
-      >
+      <BackgroundImage screen={screen} overlay={backgroundOverlay} style={containerStyle}>
         {showHeader && (
-          <Header
-            title={headerTitle}
-            backgroundColor={headerBackgroundColor}
-            showLogo={showLogo}
-          />
+          <Header title={headerTitle} backgroundColor={headerBackgroundColor} showLogo={showLogo} />
         )}
-        <View style={{ flex: 1 }}>
-          {children}
-        </View>
+        <View style={{ flex: 1 }}>{children}</View>
       </BackgroundImage>
     );
   }
@@ -56,15 +46,9 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   return (
     <View style={containerStyle}>
       {showHeader && (
-        <Header
-          title={headerTitle}
-          backgroundColor={headerBackgroundColor}
-          showLogo={showLogo}
-        />
+        <Header title={headerTitle} backgroundColor={headerBackgroundColor} showLogo={showLogo} />
       )}
-      <View style={{ flex: 1 }}>
-        {children}
-      </View>
+      <View style={{ flex: 1 }}>{children}</View>
     </View>
   );
 };

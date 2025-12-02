@@ -2,11 +2,11 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AppProvider } from './src/providers/AppProvider';
-import { useAuth } from './src/hooks/useAuth';
+import { useAuth } from './src/features/auth/hooks/useAuth';
 import { RootStackParamList } from './src/types';
-import OnboardingScreen from './src/screens/OnboardingScreen';
-import LoginScreen from './src/screens/LoginScreen';
-import RegisterScreen from './src/screens/RegisterScreen';
+import OnboardingScreen from './src/features/auth/screens/OnboardingScreen';
+import LoginScreen from './src/features/auth/screens/LoginScreen';
+import RegisterScreen from './src/features/auth/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,13 +20,10 @@ function AppNavigator() {
     if (isAuthenticated) return 'Home';
     return 'Onboarding';
   };
-  
+
   return (
     <NavigationContainer>
-      <Stack.Navigator 
-        initialRouteName={getInitialRoute()} 
-        screenOptions={{ headerShown: false }}
-      >
+      <Stack.Navigator initialRouteName={getInitialRoute()} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />

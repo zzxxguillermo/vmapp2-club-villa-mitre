@@ -9,10 +9,7 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import {
-  PanGestureHandler,
-  State,
-} from 'react-native-gesture-handler';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { COLORS } from '../constants/colors';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -22,7 +19,7 @@ interface FloatingChatBotProps {
 }
 
 export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
-  initialPosition = { x: screenWidth - 80, y: screenHeight - 200 }
+  initialPosition = { x: screenWidth - 80, y: screenHeight - 200 },
 }) => {
   const [position, setPosition] = useState(initialPosition);
   const translateX = useRef(new Animated.Value(initialPosition.x)).current;
@@ -37,7 +34,7 @@ export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
   const onHandlerStateChange = (event: any) => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       const { translationX, translationY } = event.nativeEvent;
-      
+
       // Calcular nueva posición
       let newX = position.x + translationX;
       let newY = position.y + translationY;
@@ -45,7 +42,7 @@ export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
       // Límites de la pantalla con margen
       const margin = 30;
       const botSize = 60;
-      
+
       newX = Math.max(margin, Math.min(screenWidth - botSize - margin, newX));
       newY = Math.max(margin, Math.min(screenHeight - botSize - margin, newY));
 
@@ -87,7 +84,7 @@ export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
 
     // Abrir WhatsApp
     const whatsappUrl = 'https://wa.me/+5492915207677';
-    
+
     try {
       const supported = await Linking.canOpenURL(whatsappUrl);
       if (supported) {
@@ -100,36 +97,21 @@ export const FloatingChatBot: React.FC<FloatingChatBotProps> = ({
         );
       }
     } catch (error) {
-      Alert.alert(
-        'Error',
-        'No se pudo abrir el enlace de WhatsApp',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Error', 'No se pudo abrir el enlace de WhatsApp', [{ text: 'OK' }]);
     }
   };
 
   return (
-    <PanGestureHandler
-      onGestureEvent={onGestureEvent}
-      onHandlerStateChange={onHandlerStateChange}
-    >
+    <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
       <Animated.View
         style={[
           styles.container,
           {
-            transform: [
-              { translateX },
-              { translateY },
-              { scale },
-            ],
+            transform: [{ translateX }, { translateY }, { scale }],
           },
         ]}
       >
-        <TouchableOpacity
-          style={styles.button}
-          onPress={handlePress}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity style={styles.button} onPress={handlePress} activeOpacity={0.8}>
           <Image
             source={require('../../assets/logo-chatbot.png')}
             style={styles.botImage}

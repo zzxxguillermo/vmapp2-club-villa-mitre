@@ -18,21 +18,21 @@ const servicios: Servicio[] = [
     title: 'Tienda',
     description: 'Indumentaria oficial, accesorios y productos del club',
     icon: 'storefront-outline',
-    screen: 'Tienda'
+    screen: 'Tienda',
   },
   {
     id: '2',
     title: 'Mutual',
     description: 'Prestaciones médicas y servicios de salud',
     icon: 'medical-outline',
-    screen: 'Mutual'
+    screen: 'Mutual',
   },
   {
     id: '3',
     title: 'Villa Mitre Viajes',
     description: 'Agencia de turismo y paquetes de viaje',
     icon: 'airplane-outline',
-    screen: 'VillaMitreViajes'
+    screen: 'VillaMitreViajes',
   },
 ];
 
@@ -49,10 +49,8 @@ export default function ServiciosScreen() {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.headerText}>Servicios</Text>
-      <Text style={styles.subHeaderText}>
-        Accede a todos los servicios exclusivos para socios
-      </Text>
-      
+      <Text style={styles.subHeaderText}>Accede a todos los servicios exclusivos para socios</Text>
+
       <View style={styles.serviciosContainer}>
         {servicios.map((servicio) => (
           <TouchableOpacity
@@ -78,7 +76,7 @@ export default function ServiciosScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.GRAY_LIGHTEST,
     paddingHorizontal: 20,
   },
   headerText: {
@@ -106,7 +104,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: COLORS.BLACK,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -116,7 +114,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#E8F5E8',
+    backgroundColor: COLORS.GREEN_LIGHTER,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,

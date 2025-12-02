@@ -9,18 +9,10 @@ interface NavigationCardProps {
   onPress: () => void;
 }
 
-export const NavigationCard: React.FC<NavigationCardProps> = ({ 
-  title, 
-  imageSource, 
-  onPress 
-}) => {
+export const NavigationCard: React.FC<NavigationCardProps> = ({ title, imageSource, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
-      <ImageBackground 
-        source={imageSource}
-        style={styles.card}
-        imageStyle={styles.cardImage}
-      >
+      <ImageBackground source={imageSource} style={styles.card} imageStyle={styles.cardImage}>
         <View style={styles.overlay} />
         <View style={styles.content}>
           <Typography variant="h2" style={styles.title}>

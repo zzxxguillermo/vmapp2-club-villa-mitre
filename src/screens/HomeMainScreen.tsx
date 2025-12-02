@@ -5,7 +5,7 @@ import { BackgroundImage } from '../components/BackgroundImage';
 import { Typography } from '../components/Typography';
 import { NavigationCard } from '../components/NavigationCard';
 import { FloatingChatBot } from '../components/FloatingChatBot';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/hooks/useAuth';
 import { COLORS } from '../constants/colors';
 import { getCardImage } from '../constants/images';
 
@@ -14,7 +14,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export default function HomeMainScreen() {
   const { user } = useAuth();
   const navigation = useNavigation();
-  
+
   const navigateToSection = (screen: string) => {
     // Debug para verificar el tipo de usuario
     if (__DEV__) {
@@ -37,13 +37,12 @@ export default function HomeMainScreen() {
     }
   };
 
-
   return (
     <BackgroundImage screen="home" overlay={true} overlayOpacity={0.2}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <View style={styles.welcomeSection}>
           <View style={styles.textContainer}>
-            <Text 
+            <Text
               style={styles.welcomeTitle}
               adjustsFontSizeToFit
               numberOfLines={1}
@@ -51,7 +50,7 @@ export default function HomeMainScreen() {
             >
               ¡Hola {(user?.nombre || user?.name || 'Usuario').split(' ')[0]}!
             </Text>
-            <Text 
+            <Text
               style={styles.welcomeSubtitle}
               adjustsFontSizeToFit
               numberOfLines={1}
@@ -62,20 +61,19 @@ export default function HomeMainScreen() {
           </View>
         </View>
 
-
         <View style={styles.sectionsContainer}>
           <NavigationCard
             title="Carnet Virtual"
             imageSource={getCardImage('carnet')}
             onPress={() => navigateToSection('MiCarnet')}
           />
-          
+
           <NavigationCard
             title="Estado de Cuenta"
             imageSource={getCardImage('estado')}
             onPress={() => navigateToSection('EstadoDeCuenta')}
           />
-          
+
           <NavigationCard
             title="Red de Beneficios"
             imageSource={getCardImage('beneficios')}
@@ -83,7 +81,7 @@ export default function HomeMainScreen() {
           />
         </View>
       </ScrollView>
-      
+
       {/* ChatBot flotante */}
       <FloatingChatBot />
     </BackgroundImage>

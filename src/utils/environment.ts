@@ -72,47 +72,46 @@ export const testApiConnectivity = async (): Promise<void> => {
   const apiUrl = getApiBaseUrl();
   console.log('🔍 Testing API connectivity...');
   console.log('🎯 Target URL:', apiUrl);
-  
+
   try {
     // Test basic connectivity to domain
     const baseUrl = apiUrl.replace('/api', '');
     console.log('🌐 Testing base domain:', baseUrl);
-    
+
     const response = await fetch(baseUrl, {
       method: 'GET',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'User-Agent': 'VillaMitreApp/1.0.0',
       },
     });
-    
+
     console.log('✅ Base domain test:', response.status, response.statusText);
     console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-    
+
     // Test API endpoint specifically
     console.log('🔍 Testing API endpoint:', `${apiUrl}/auth/login`);
     const apiResponse = await fetch(`${apiUrl}/auth/login`, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
         'User-Agent': 'VillaMitreApp/1.0.0',
       },
       body: JSON.stringify({
         dni: 'test',
-        password: 'test'
+        password: 'test',
       }),
     });
-    
+
     console.log('🔍 API login endpoint test:', apiResponse.status, apiResponse.statusText);
-    
+
     if (apiResponse.status === 422 || apiResponse.status === 401) {
       console.log('✅ API endpoint is responding (validation/auth error expected)');
     }
-    
   } catch (error) {
     console.error('❌ Connectivity test failed:', error);
-    
+
     if (error instanceof TypeError && error.message.includes('Network request failed')) {
       console.error('🚨 NETWORK ISSUE DETECTED:');
       console.error('  1. Check if localtunnel server is running at:', apiUrl);
@@ -121,14 +120,14 @@ export const testApiConnectivity = async (): Promise<void> => {
       console.error('  4. Verify device network connection');
       console.error('  5. Try accessing', apiUrl, 'in browser');
     }
-    
+
     // Additional error details
     if (error && typeof error === 'object') {
       console.error('🔍 Error object:', {
         name: (error as any).name,
         message: (error as any).message,
         code: (error as any).code,
-        stack: (error as any).stack
+        stack: (error as any).stack,
       });
     }
   }

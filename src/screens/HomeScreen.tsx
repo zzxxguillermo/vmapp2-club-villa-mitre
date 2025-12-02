@@ -6,18 +6,16 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
-import type {
-  DrawerContentComponentProps,
-  DrawerNavigationProp,
-} from '@react-navigation/drawer';
+import type { DrawerContentComponentProps, DrawerNavigationProp } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { Logo } from '../components/Logo';
 import { CommonActions } from '@react-navigation/native';
-import { useAuth } from '../hooks/useAuth';
+import { COLORS } from '../constants/colors';
+import { useAuth } from '../features/auth/hooks/useAuth';
 import DetalleCuponScreen from './DetalleCuponScreen';
 
 import HomeMainScreen from './HomeMainScreen';
-import ActividadesScreen from './ActividadesScreen';
+import ActividadesScreen from '../features/activities/screens/ActividadesScreen';
 import CentroDeportivoScreen from './CentroDeportivoScreen';
 import AreasInstitucionalesScreen from './AreasInstitucionalesScreen';
 import ServiciosScreen from './ServiciosScreen';
@@ -26,9 +24,9 @@ import MisBeneficiosScreen from './MisBeneficiosScreen';
 import EstadoDeCuentaScreen from './EstadoDeCuentaScreen';
 import MiCarnetScreen from './MiCarnetScreen';
 import QRBeneficioScreen from './QRBeneficioScreen';
-import GimnasioScreen from './GimnasioScreen';
-import TemplateDetailScreen from './gym/TemplateDetailScreen';
-import WeeklyScheduleScreen from './gym/WeeklyScheduleScreen';
+import GimnasioScreen from '../features/gym/screens/GimnasioScreen';
+import TemplateDetailScreen from '../features/gym/screens/TemplateDetailScreen';
+import WeeklyScheduleScreen from '../features/gym/screens/WeeklyScheduleScreen';
 // ❌ import eliminado:
 // import MisCuponesScreen from './MisCuponesScreen';
 
@@ -48,6 +46,7 @@ type DrawerParamList = {
   MisBeneficios: undefined; // ✅ mantenemos MisBeneficios
   EstadoDeCuenta: undefined;
   MiCarnet: undefined;
+  DetalleCupon: { beneficio?: any; cupon?: any; item?: any; promotion?: any; promo?: any } | undefined;
 };
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -55,7 +54,7 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 // -------- Drawer personalizado --------
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { logout, user } = useAuth();
-  const nav = props.navigation as DrawerNavigationProp<DrawerParamList>;
+  const nav = props.navigation as any;
 
   const hasAccess = (feature: string): boolean => {
     const userType = user?.user_type;
@@ -167,8 +166,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       {/* Cerrar Sesión */}
       <DrawerItem
         label="Cerrar Sesión"
-        icon={() => <Ionicons name="log-out-outline" size={22} color="#FF4444" />}
-        labelStyle={{ color: '#FF4444' }}
+        icon={() => <Ionicons name="log-out-outline" size={22} color={COLORS.ERROR} />}
+        labelStyle={{ color: COLORS.ERROR }}
         onPress={handleLogout}
       />
     </DrawerContentScrollView>
@@ -183,8 +182,8 @@ export default function HomeScreen() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={({ navigation }) => ({
         headerShown: true,
-        headerStyle: { backgroundColor: '#00973D', height: 110 },
-        headerTintColor: '#FFFFFF',
+        headerStyle: { backgroundColor: COLORS.PRIMARY_GREEN, height: 110 },
+        headerTintColor: COLORS.WHITE,
         headerTitleStyle: {
           fontFamily: 'BarlowCondensed-Bold',
           fontWeight: '700',
@@ -193,7 +192,7 @@ export default function HomeScreen() {
           marginLeft: 0,
           textAlign: 'center',
           textTransform: 'uppercase',
-          color: '#FFFFFF',
+          color: COLORS.WHITE,
         },
         headerTitle: 'CLUB VILLA MITRE',
         headerRight: () => (

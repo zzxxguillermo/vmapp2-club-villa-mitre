@@ -8,12 +8,12 @@ interface TypographyProps extends TextProps {
   fontFamily?: string;
 }
 
-export const Typography: React.FC<TypographyProps> = ({ 
-  variant = 'body', 
-  style, 
-  children, 
+export const Typography: React.FC<TypographyProps> = ({
+  variant = 'body',
+  style,
+  children,
   fontFamily,
-  ...props 
+  ...props
 }) => {
   const customStyle = fontFamily ? { fontFamily } : {};
   return (

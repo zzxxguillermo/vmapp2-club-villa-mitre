@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../constants/colors';
@@ -197,7 +190,7 @@ export default function AreasInstitucionalesScreen() {
       // @ts-ignore - Navegación a pantallas específicas si existen en tu navigator
       navigation.navigate(area.screen);
     } else {
-      setExpanded(prev => ({ ...prev, [area.id]: !prev[area.id] }));
+      setExpanded((prev) => ({ ...prev, [area.id]: !prev[area.id] }));
     }
   };
 
@@ -233,7 +226,7 @@ export default function AreasInstitucionalesScreen() {
       </Text>
 
       <View style={styles.areasContainer}>
-        {areasInstitucionales.map(area => {
+        {areasInstitucionales.map((area) => {
           const isOpen = !!expanded[area.id];
           return (
             <View key={area.id} style={styles.cardWrapper}>
@@ -297,7 +290,8 @@ export default function AreasInstitucionalesScreen() {
                                 >
                                   <Ionicons name="logo-whatsapp" size={16} color={COLORS.WHITE} />
                                   <Text style={styles.contactPillText}>
-                                    {c.label ? `${c.label}: ` : ''}{c.whatsapp}
+                                    {c.label ? `${c.label}: ` : ''}
+                                    {c.whatsapp}
                                   </Text>
                                 </TouchableOpacity>
                               ) : null}
@@ -311,7 +305,8 @@ export default function AreasInstitucionalesScreen() {
                                 >
                                   <Ionicons name="call-outline" size={16} color={COLORS.WHITE} />
                                   <Text style={styles.contactPillText}>
-                                    {c.label ? `${c.label}: ` : ''}{c.phone}
+                                    {c.label ? `${c.label}: ` : ''}
+                                    {c.phone}
                                   </Text>
                                 </TouchableOpacity>
                               ) : null}
@@ -323,7 +318,11 @@ export default function AreasInstitucionalesScreen() {
                                   onPress={() => openMaps(c.address)}
                                   activeOpacity={0.8}
                                 >
-                                  <Ionicons name="location-outline" size={16} color={COLORS.WHITE} />
+                                  <Ionicons
+                                    name="location-outline"
+                                    size={16}
+                                    color={COLORS.WHITE}
+                                  />
                                   <Text style={styles.contactPillText}>{c.address}</Text>
                                 </TouchableOpacity>
                               ) : null}

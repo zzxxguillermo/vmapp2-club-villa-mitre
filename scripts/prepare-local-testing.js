@@ -19,7 +19,7 @@ const envPath = path.join(process.cwd(), '.env');
 if (fs.existsSync(envPath)) {
   const envContent = fs.readFileSync(envPath, 'utf8');
   console.log('✅ Archivo .env encontrado');
-  
+
   if (envContent.includes('API_BASE_URL=http://10.0.2.2:8000/api')) {
     console.log('✅ API_BASE_URL configurada para Android Emulator');
   } else if (envContent.includes('localhost:8000')) {
@@ -27,7 +27,7 @@ if (fs.existsSync(envPath)) {
   } else {
     console.log('⚠️  Verificar configuración de API_BASE_URL en .env');
   }
-  
+
   if (envContent.includes('USE_MIRAGE_SERVER=false')) {
     console.log('✅ Mirage Server deshabilitado (usando API real)');
   } else {
@@ -42,11 +42,11 @@ const appJsonPath = path.join(process.cwd(), 'app.json');
 if (fs.existsSync(appJsonPath)) {
   const appJson = JSON.parse(fs.readFileSync(appJsonPath, 'utf8'));
   console.log('✅ Archivo app.json encontrado');
-  
+
   if (appJson.expo?.extra?.API_BASE_URL) {
     console.log(`✅ API_BASE_URL en app.json: ${appJson.expo.extra.API_BASE_URL}`);
   }
-  
+
   if (appJson.expo?.packagerOpts?.config === 'metro.config.js') {
     console.log('✅ Metro config configurado');
   }
@@ -63,10 +63,10 @@ const gymComponents = [
   'src/components/gym/index.ts',
   'src/screens/gym/DailyWorkoutScreen.tsx',
   'src/services/gymService.ts',
-  'src/types/gym.ts'
+  'src/types/gym.ts',
 ];
 
-gymComponents.forEach(component => {
+gymComponents.forEach((component) => {
   const componentPath = path.join(process.cwd(), component);
   if (fs.existsSync(componentPath)) {
     console.log(`✅ ${component}`);
@@ -83,10 +83,10 @@ const testFiles = [
   'src/__tests__/services/authService.simple.test.ts',
   'src/__tests__/services/promotionService.simple.test.ts',
   'src/__tests__/services/gymService.simple.test.ts',
-  'src/__tests__/integration/authFlow.simple.test.ts'
+  'src/__tests__/integration/authFlow.simple.test.ts',
 ];
 
-testFiles.forEach(testFile => {
+testFiles.forEach((testFile) => {
   const testPath = path.join(process.cwd(), testFile);
   if (fs.existsSync(testPath)) {
     console.log(`✅ ${testFile}`);

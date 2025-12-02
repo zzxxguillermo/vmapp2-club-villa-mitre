@@ -8,12 +8,12 @@ export const theme = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND_PRIMARY,
   },
-  
+
   containerSecondary: {
     flex: 1,
     backgroundColor: COLORS.BACKGROUND_SECONDARY,
   },
-  
+
   // Cards y superficies
   card: {
     backgroundColor: COLORS.WHITE,
@@ -26,7 +26,7 @@ export const theme = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  
+
   cardGreen: {
     backgroundColor: COLORS.PRIMARY_GREEN,
     borderRadius: 12,
@@ -38,7 +38,7 @@ export const theme = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  
+
   // Botones
   buttonPrimary: {
     backgroundColor: COLORS.PRIMARY_GREEN,
@@ -48,7 +48,7 @@ export const theme = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   buttonSecondary: {
     backgroundColor: COLORS.WHITE,
     borderRadius: 8,
@@ -59,7 +59,7 @@ export const theme = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   buttonDark: {
     backgroundColor: COLORS.PRIMARY_BLACK,
     borderRadius: 8,
@@ -68,7 +68,7 @@ export const theme = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
+
   // Inputs
   input: {
     borderWidth: 1,
@@ -79,12 +79,12 @@ export const theme = StyleSheet.create({
     backgroundColor: COLORS.WHITE,
     color: COLORS.TEXT_PRIMARY,
   },
-  
+
   inputFocused: {
     borderColor: COLORS.PRIMARY_GREEN,
     borderWidth: 2,
   },
-  
+
   // Headers y navegación
   header: {
     backgroundColor: COLORS.PRIMARY_GREEN,
@@ -96,7 +96,7 @@ export const theme = StyleSheet.create({
     justifyContent: 'space-between',
     minHeight: 100,
   },
-  
+
   headerDark: {
     backgroundColor: COLORS.PRIMARY_BLACK,
     paddingVertical: 16,
@@ -105,30 +105,30 @@ export const theme = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  
+
   // Separadores
   divider: {
     height: 1,
     backgroundColor: COLORS.BORDER_LIGHT,
     marginVertical: 16,
   },
-  
+
   dividerThick: {
     height: 2,
     backgroundColor: COLORS.BORDER_DARK,
     marginVertical: 20,
   },
-  
+
   // Estados de elementos
   disabled: {
     opacity: 0.6,
   },
-  
+
   selected: {
     backgroundColor: COLORS.GREEN_LIGHTER,
     borderColor: COLORS.PRIMARY_GREEN,
   },
-  
+
   // Overlays y modales
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -136,7 +136,7 @@ export const theme = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  
+
   modal: {
     backgroundColor: COLORS.WHITE,
     borderRadius: 16,

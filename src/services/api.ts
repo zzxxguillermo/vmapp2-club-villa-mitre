@@ -1,159 +1,113 @@
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getApiBaseUrl, shouldUseMirageServer } from '../utils/environment';
 
 // Base API configuration
 const API_BASE_URL = shouldUseMirageServer() ? '/api' : getApiBaseUrl();
 
+export interface ApiError extends Error {
+  validationErrors?: Record<string, string[]> | null;
+  statusCode?: number;
+  originalError?: AxiosError;
+}
+
 export class ApiClient {
-  private baseURL: string;
+  private axiosInstance: AxiosInstance;
 
-  constructor(baseURL: string = API_BASE_URL) {
-    this.baseURL = baseURL;
-  }
-
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
-    const url = `${this.baseURL}${endpoint}`;
-    
-    const config: RequestInit = {
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: API_BASE_URL,
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
       },
-      ...options,
-    };
+    });
 
-    // Add auth token if available
-    const token = await this.getAuthToken();
-    if (token) {
-      config.headers = {
-        ...config.headers,
-        Authorization: `Bearer ${token}`,
-      };
-    }
-
-    try {
-      console.log(`🌐 API Request: ${config.method || 'GET'} ${url}`);
-      console.log('📋 Request config:', {
-        url,
-        method: config.method || 'GET',
-        headers: config.headers,
-        bodyLength: config.body && typeof config.body === 'string' ? config.body.length : 0,
-        bodyPreview: config.body && typeof config.body === 'string' ? config.body.substring(0, 200) + '...' : 'No body'
-      });
-      
-      // Log exact body content for debugging
-      if (config.body && typeof config.body === 'string') {
-        console.log('📄 Request body (full):', config.body);
-        console.log('📊 Body analysis:', {
-          length: config.body.length,
-          firstChar: config.body.charAt(0),
-          lastChar: config.body.charAt(config.body.length - 1),
-          containsQuotes: config.body.includes('"'),
-          containsBackslash: config.body.includes('\\'),
-          isValidJSON: (() => {
-            try {
-              JSON.parse(config.body as string);
-              return true;
-            } catch {
-              return false;
-            }
-          })()
-        });
-      }
-      
-      const response = await fetch(url, config);
-      
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        console.error(`❌ API Error: ${response.status} ${response.statusText}`);
-        
-        // Handle different error responses
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        let validationErrors = null;
-        
-        try {
-          const errorData = await response.json();
-          console.error('❌ Error response data:', errorData);
-          console.error('🔍 Error data type:', typeof errorData);
-          console.error('🔍 Error data keys:', Object.keys(errorData));
-          
-          // Log errors object specifically
-          if (errorData.errors) {
-            console.error('📋 Validation errors object:', JSON.stringify(errorData.errors, null, 2));
-            validationErrors = errorData.errors;
-          }
-          
-          if (errorData.message) {
-            errorMessage = errorData.message;
-          }
-          
-          if (errorData.errors) {
-            // Laravel validation errors
-            const errors = Object.values(errorData.errors).flat();
-            console.error('📝 Formatted errors:', errors);
-            if (errors.length > 0) {
-              errorMessage = errors.join('\n');
-            }
-          }
-        } catch (e) {
-          console.error('❌ Could not parse error response as JSON', e);
-        }
-        
-        const error: any = new Error(errorMessage);
-        error.validationErrors = validationErrors;
-        error.statusCode = response.status;
-        throw error;
-      }
-
-      const data = await response.json();
-      console.log('✅ API Response data:', data);
-      return data;
-      
-    } catch (error) {
-      console.error('💥 API request failed:', error);
-      
-      // Detailed error logging
-      if (error instanceof Error) {
-        console.error('🔍 Error details:', {
-          name: error.name,
-          message: error.message,
-          stack: error.stack
-        });
-      }
-      
-      // Network error details
-      if (error && typeof error === 'object' && 'code' in error) {
-        console.error('🔍 Network error code:', (error as any).code);
-      }
-      
-      // Check if it's a TypeError (common for network issues)
-      if (error instanceof TypeError && error.message.includes('Network request failed')) {
-        console.error('🌐 Network connectivity issue detected');
-        console.error('🔍 Possible causes:');
-        console.error('  - Server is down or unreachable');
-        console.error('  - DNS resolution failed');
-        console.error('  - Firewall blocking request');
-        console.error('  - CORS issues');
-        console.error('  - SSL/TLS certificate problems');
-      }
-      
-      throw error;
-    }
+    this.setupInterceptors();
   }
 
-  private async getAuthToken(): Promise<string | null> {
+  private setupInterceptors() {
+    // Request Interceptor
+    this.axiosInstance.interceptors.request.use(
+      async (config) => {
+        const token = await this.getAuthToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        if (__DEV__) {
+          console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        }
+
+        return config;
+      },
+      (error) => {
+        console.error('💥 Request Error:', error);
+        return Promise.reject(error);
+      }
+    );
+
+    // Response Interceptor
+    this.axiosInstance.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error: AxiosError<any>) => {
+        const formattedError = this.handleError(error);
+        return Promise.reject(formattedError);
+      }
+    );
+  }
+
+  private handleError(error: AxiosError<any>): ApiError {
+    let errorMessage = 'An unexpected error occurred';
+    let validationErrors = null;
+    let statusCode = 0;
+
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      statusCode = error.response.status;
+      console.error(`❌ API Error: ${statusCode} ${error.response.statusText}`);
+
+      const errorData = error.response.data;
+
+      if (errorData) {
+        if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+
+        if (errorData.errors) {
+          validationErrors = errorData.errors;
+          // Laravel validation errors flattening
+          const errors = Object.values(errorData.errors).flat();
+          if (errors.length > 0) {
+            errorMessage = String(errors.join('\n'));
+          }
+        }
+      }
+    } else if (error.request) {
+      // The request was made but no response was received
+      errorMessage = 'Network Error: No response received';
+      console.error('🌐 Network connectivity issue detected');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      errorMessage = error.message;
+    }
+
+    const customError: ApiError = new Error(errorMessage);
+    customError.validationErrors = validationErrors;
+    customError.statusCode = statusCode;
+    customError.originalError = error;
+
+    return customError;
+  }
+
+  // Token management methods
+  async getAuthToken(): Promise<string | null> {
     try {
-      // Get token from AsyncStorage for real backend integration
       if (shouldUseMirageServer()) {
-        // For Mirage server, return null (no auth needed)
         return null;
       }
-      
       const token = await AsyncStorage.getItem('auth_token');
       return token;
     } catch (error) {
@@ -164,7 +118,6 @@ export class ApiClient {
     }
   }
 
-  // Token management methods
   async setAuthToken(token: string): Promise<void> {
     try {
       await AsyncStorage.setItem('auth_token', token);
@@ -205,26 +158,25 @@ export class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'GET' });
+  // Generic request methods
+  async get<T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.axiosInstance.get<T>(endpoint, config);
+    return response.data;
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  async post<T, D = unknown>(endpoint: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.axiosInstance.post<T>(endpoint, data, config);
+    return response.data;
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<T> {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  async put<T, D = unknown>(endpoint: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.axiosInstance.put<T>(endpoint, data, config);
+    return response.data;
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(endpoint: string, config?: AxiosRequestConfig): Promise<T> {
+    const response = await this.axiosInstance.delete<T>(endpoint, config);
+    return response.data;
   }
 }
 

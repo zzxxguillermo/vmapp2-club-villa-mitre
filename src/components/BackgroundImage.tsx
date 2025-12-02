@@ -20,7 +20,7 @@ export const BackgroundImage: React.FC<BackgroundImageProps> = ({
   ...props
 }) => {
   const backgroundSource = getBackgroundImage(screen);
-  
+
   if (!backgroundSource) {
     return null;
   }
@@ -30,19 +30,16 @@ export const BackgroundImage: React.FC<BackgroundImageProps> = ({
     ...(style as ViewStyle),
   };
 
-  const overlayStyle: ViewStyle = overlay ? {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: overlayColor,
-    opacity: overlayOpacity,
-  } : {};
+  const overlayStyle: ViewStyle = overlay
+    ? {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: overlayColor,
+        opacity: overlayOpacity,
+      }
+    : {};
 
   return (
-    <ImageBackground
-      source={backgroundSource}
-      style={containerStyle}
-      resizeMode="cover"
-      {...props}
-    >
+    <ImageBackground source={backgroundSource} style={containerStyle} resizeMode="cover" {...props}>
       {overlay && <View style={overlayStyle} />}
       {children}
     </ImageBackground>

@@ -3,13 +3,13 @@ export const COLORS = {
   // Colores principales del club
   PRIMARY_GREEN: '#00973D',
   PRIMARY_BLACK: '#1D1D1B',
-  
+
   // Variaciones del verde principal
   GREEN_LIGHT: '#00B347',
   GREEN_DARK: '#007A32',
   GREEN_LIGHTER: '#E8F5E8',
   GREEN_DARKER: '#005A26',
-  
+
   // Variaciones del negro/gris
   BLACK_LIGHT: '#2D2D2B',
   BLACK_LIGHTER: '#4D4D4B',
@@ -18,22 +18,24 @@ export const COLORS = {
   GRAY_LIGHT: '#CCCCCC',
   GRAY_LIGHTER: '#E5E5E5',
   GRAY_LIGHTEST: '#F5F5F5',
-  
+
   // Colores de sistema
   WHITE: '#FFFFFF',
   BLACK: '#000000',
   TRANSPARENT: 'transparent',
-  
+
   // Estados de la UI
   SUCCESS: '#00973D', // Usa el verde del club
   ERROR: '#DC3545',
   WARNING: '#FFC107',
+  WARNING_LIGHT: '#FFF3CD',
+  WARNING_DARK: '#856404',
   INFO: '#17A2B8',
   // Colores de fondo
   BACKGROUND_PRIMARY: '#FFFFFF',
   BACKGROUND_SECONDARY: '#F8F9FA',
   BACKGROUND_TERTIARY: '#E8F5E8', // Verde muy claro
-  
+
   // Colores de texto
   TEXT_PRIMARY: '#2B2D42',
   TEXT_SECONDARY: '#757575',
@@ -42,12 +44,12 @@ export const COLORS = {
   TEXT_DISABLED: '#9E9E9E',
   TEXT_ON_GREEN: '#FFFFFF',
   TEXT_ON_BLACK: '#FFFFFF',
-  
+
   // Colores de bordes
   BORDER_LIGHT: '#E5E5E5',
   BORDER_DARK: '#999999',
   BORDER_GREEN: '#00973D',
-  
+
   // Colores de sombras
   SHADOW_LIGHT: 'rgba(0, 0, 0, 0.1)',
   SHADOW_MEDIUM: 'rgba(0, 0, 0, 0.15)',
@@ -56,7 +58,7 @@ export const COLORS = {
 } as const;
 
 // Tipos para TypeScript
-export type ColorValue = typeof COLORS[keyof typeof COLORS];
+export type ColorValue = (typeof COLORS)[keyof typeof COLORS];
 
 // Paleta temática para diferentes secciones
 export const THEME_COLORS = {
@@ -67,7 +69,7 @@ export const THEME_COLORS = {
     background: COLORS.WHITE,
     surface: COLORS.BACKGROUND_TERTIARY,
   },
-  
+
   // Tema para actividades deportivas
   SPORTS: {
     primary: COLORS.PRIMARY_GREEN,
@@ -75,7 +77,7 @@ export const THEME_COLORS = {
     background: COLORS.BACKGROUND_SECONDARY,
     surface: COLORS.WHITE,
   },
-  
+
   // Tema para beneficios y cupones
   BENEFITS: {
     primary: COLORS.PRIMARY_BLACK,

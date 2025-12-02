@@ -36,7 +36,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
       format: 'png',
       margin: '10',
     });
-    
+
     return `${baseUrl}?${params.toString()}`;
   };
 
@@ -48,9 +48,7 @@ export const QRCode: React.FC<QRCodeProps> = ({
         resizeMode="contain"
         accessibilityLabel={`Código QR: ${data}`}
       />
-      {showLabel && label && (
-        <Text style={styles.label}>{label}</Text>
-      )}
+      {showLabel && label && <Text style={styles.label}>{label}</Text>}
     </View>
   );
 };
@@ -76,12 +74,17 @@ export const CarnetQRCode: React.FC<{
           resizeMode="contain"
           accessibilityLabel={`Código QR: ${qrData}`}
         />
-        <View style={[styles.logoOverlay, { 
-          width: size * 0.12, 
-          height: size * 0.12,
-          top: (size - size * 0.12) / 2,
-          left: (size - size * 0.12) / 2,
-        }]}>
+        <View
+          style={[
+            styles.logoOverlay,
+            {
+              width: size * 0.12,
+              height: size * 0.12,
+              top: (size - size * 0.12) / 2,
+              left: (size - size * 0.12) / 2,
+            },
+          ]}
+        >
           <Image
             source={require('../../assets/cvm-escudo-para-fondo-blanco.png')}
             style={styles.logoImage}
@@ -105,7 +108,7 @@ const generateQRUrl = (data: string, size: number) => {
     format: 'png',
     margin: '10',
   });
-  
+
   return `${baseUrl}?${params.toString()}`;
 };
 

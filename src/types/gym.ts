@@ -63,11 +63,24 @@ export interface Assignment {
   daily_template_id: number;
   template_name: string;
   frequency: '1x_week' | '2x_week' | '3x_week' | '4x_week' | '5x_week' | 'daily';
-  assigned_days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
+  assigned_days: (
+    | 'monday'
+    | 'tuesday'
+    | 'wednesday'
+    | 'thursday'
+    | 'friday'
+    | 'saturday'
+    | 'sunday'
+  )[];
   start_date: string; // YYYY-MM-DD
   end_date: string | null; // YYYY-MM-DD
   is_active: boolean;
   template: DailyTemplate;
+}
+
+export interface TemplateWithDetails extends Assignment {
+  detailsLoaded?: boolean;
+  fullTemplate?: DailyTemplate;
 }
 
 // ===== API RESPONSES =====
@@ -118,5 +131,113 @@ export interface ExercisesListResponse {
 
 // ===== UTILITY TYPES =====
 
-export type WeekDay = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type WeekDay =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
+
+// ===== RAW BACKEND TYPES (for internal mapping) =====
+
+export interface RawTemplate {
+  id: number;
+  title?: string;
+  name?: string;
+  description?: string;
+  estimated_duration_min?: number;
+  estimated_duration_minutes?: number;
+  level?: 'beginner' | 'intermediate' | 'advanced';
+  difficulty_level?: 'beginner' | 'intermediate' | 'advanced';
+  is_active?: boolean;
+  sets?: RawSet[];
+}
+
+export interface RawAssignment {
+  id: number;
+  daily_template?: RawTemplate;
+  template?: RawTemplate;
+  frequency?: number[];
+  start_date?: string;
+  end_date?: string;
+  status?: string;
+}
+
+export interface RawSet {
+  set_number?: number;
+  reps_min?: number;
+  reps_max?: number;
+  weight_target?: number;
+  weight_min?: number;
+  weight_max?: number;
+  rest_seconds?: number;
+  notes?: string;
+  exercises?: RawExercise[];
+}
+
+export interface RawExercise {
+  id: number;
+  exercise_id?: number;
+  name?: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  target_muscle_groups?: string[];
+  muscle_group?: string;
+  muscleGroup?: string;
+  difficulty_level?: string;
+  difficulty?: string;
+  level?: string;
+  equipment?: string;
+  equipment_needed?: string;
+  video_url?: string;
+  image_url?: string;
+  instructions?: string;
+  sets?: RawSet[];
+}
+
+export interface MyTemplatesResponse {
+  data?: {
+    templates: RawAssignment[];
+  };
+  templates?: RawAssignment[];
+}
+
+export interface StudentTemplateDetailsResponse {
+  data?: {
+    template: RawTemplate;
+    exercises: RawExercise[];
+  };
+  template?: RawTemplate;
+  exercises?: RawExercise[];
+}
+
+export interface RawScheduledTemplate {
+  id: number;
+  template_id?: number;
+  daily_template?: RawTemplate;
+  template_name?: string;
+  name?: string;
+  title?: string;
+  estimated_duration?: number;
+  estimated_duration_min?: number;
+  has_progress?: boolean;
+}
+
+export interface RawDaySchedule {
+  day_name?: string;
+  day?: string;
+  assignments?: RawScheduledTemplate[];
+  templates?: RawScheduledTemplate[];
+}
+
+export interface StudentWeeklyScheduleResponse {
+  data?: {
+    days?: RawDaySchedule[];
+  };
+  schedule?: Record<string, RawScheduledTemplate[]> | RawDaySchedule[];
+  days?: RawDaySchedule[];
+}
 

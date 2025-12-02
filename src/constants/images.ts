@@ -3,11 +3,11 @@ export const IMAGES = {
   // Logos adaptativos
   LOGO_WHITE_BG: require('../../assets/cvm-escudo-para-fondo-blanco.png'),
   LOGO_BLACK_BG: require('../../assets/cvm-escudo-para-fondo-negro.png'),
-  
+
   // Backgrounds
   BACKGROUND_LOGIN: require('../../assets/app_cvm_fondo_login.jpg'),
   BACKGROUND_HOME: require('../../assets/app_cvm_fondo_home.jpg'),
-  
+
   // Iconos de la app
   ICON: require('../../assets/icon.png'),
   ADAPTIVE_ICON: require('../../assets/adaptive-icon.png'),

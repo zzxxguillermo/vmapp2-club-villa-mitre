@@ -1,8 +1,16 @@
 // MisCuponesScreen.tsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Dimensions,
-  ActivityIndicator, TouchableOpacity, RefreshControl, Linking, Image
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+  ActivityIndicator,
+  TouchableOpacity,
+  RefreshControl,
+  Linking,
+  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -13,13 +21,13 @@ import { FloatingChatBot } from '../components/FloatingChatBot';
 // ===== Paleta clara (fondo blanco) =====
 const P = COLORS as Record<string, string>;
 const UI = {
-  primary: P.PRIMARY_GREEN ?? P.PRIMARY ?? '#22c55e',
-  text: '#111827',
-  textMuted: '#6b7280',
-  bg: '#ffffff',
-  card: '#ffffff',
-  border: '#e5e7eb',
-  danger: P.DANGER_RED ?? P.RED ?? '#ef4444',
+  primary: COLORS.PRIMARY_GREEN,
+  text: COLORS.PRIMARY_BLACK,
+  textMuted: COLORS.GRAY_DARK,
+  bg: COLORS.BACKGROUND_PRIMARY,
+  card: COLORS.WHITE,
+  border: COLORS.BORDER_LIGHT,
+  danger: COLORS.ERROR,
 } as const;
 
 // ====== CONFIG API ======
@@ -43,7 +51,8 @@ type Beneficio = {
 
 // ====== Helpers ======
 const SURTEK_HTTP = /^http:\/\/([a-z0-9.-]*\.)?surtekbb\.com/i;
-const toHttpsIfSurtek = (u: string) => (SURTEK_HTTP.test(u) ? u.replace(/^http:\/\//i, 'https://') : u);
+const toHttpsIfSurtek = (u: string) =>
+  SURTEK_HTTP.test(u) ? u.replace(/^http:\/\//i, 'https://') : u;
 
 function buildImageUrl(p: ApiPromotion): string {
   const link: string | undefined = p.image_link || p.imageLink;
@@ -134,7 +143,10 @@ const ImageWithLoader: React.FC<{ uri: string; style: any }> = ({ uri, style }) 
             source={{ uri }}
             style={style}
             onLoadEnd={() => setLoading(false)}
-            onError={() => { setLoading(false); setError(true); }}
+            onError={() => {
+              setLoading(false);
+              setError(true);
+            }}
           />
         </>
       ) : (
@@ -209,7 +221,7 @@ export default function MisCuponesScreen() {
         const list = parseList(json);
         const mapped = list.map(mapApiToBeneficio);
 
-        setItems(prev => (replace ? mapped : [...prev, ...mapped]));
+        setItems((prev) => (replace ? mapped : [...prev, ...mapped]));
         setPage(nextPage);
         setHasMore(computeHasMore(json, list.length));
 
@@ -251,10 +263,13 @@ export default function MisCuponesScreen() {
     return () => abortRef.current?.abort();
   }, [loadPage]);
 
-  const goToDetalle = useCallback((beneficio: Beneficio) => {
-    if (!beneficio) return;
-    navigation.navigate('DetalleCupon', { beneficio, raw: beneficio.raw, id: beneficio.id });
-  }, [navigation]);
+  const goToDetalle = useCallback(
+    (beneficio: Beneficio) => {
+      if (!beneficio) return;
+      navigation.navigate('DetalleCupon', { beneficio, raw: beneficio.raw, id: beneficio.id });
+    },
+    [navigation]
+  );
 
   const renderItem = useCallback(
     ({ item }: { item: Beneficio }) => {
@@ -263,28 +278,41 @@ export default function MisCuponesScreen() {
         <TouchableOpacity style={styles.card} activeOpacity={0.9} onPress={() => goToDetalle(item)}>
           <ImageWithLoader uri={item.imagenUrl} style={styles.image} />
           <View style={styles.cardBody}>
-            <Text style={styles.title} numberOfLines={2}>{item.titulo}</Text>
+            <Text style={styles.title} numberOfLines={2}>
+              {item.titulo}
+            </Text>
 
             <View style={styles.row}>
               <Ionicons name="storefront-outline" size={16} color={UI.textMuted} />
-              <Text style={styles.muted} numberOfLines={1}>{item.comercio}</Text>
+              <Text style={styles.muted} numberOfLines={1}>
+                {item.comercio}
+              </Text>
             </View>
 
             {!!item.direccion && (
               <View style={styles.row}>
                 <Ionicons name="location-outline" size={16} color={UI.textMuted} />
-                <Text style={styles.muted} numberOfLines={1}>{item.direccion}</Text>
+                <Text style={styles.muted} numberOfLines={1}>
+                  {item.direccion}
+                </Text>
               </View>
             )}
 
             {!!item.telefono && (
-              <TouchableOpacity style={styles.row} onPress={() => Linking.openURL(`tel:${item.telefono}`)}>
+              <TouchableOpacity
+                style={styles.row}
+                onPress={() => Linking.openURL(`tel:${item.telefono}`)}
+              >
                 <Ionicons name="call-outline" size={16} color={UI.textMuted} />
-                <Text style={[styles.muted, styles.link]} numberOfLines={1}>{item.telefono}</Text>
+                <Text style={[styles.muted, styles.link]} numberOfLines={1}>
+                  {item.telefono}
+                </Text>
               </TouchableOpacity>
             )}
 
-            <Text style={styles.desc} numberOfLines={3}>{item.descripcion || '—'}</Text>
+            <Text style={styles.desc} numberOfLines={3}>
+              {item.descripcion || '—'}
+            </Text>
 
             <View style={styles.footerRow}>
               <View style={styles.badge}>
@@ -309,45 +337,56 @@ export default function MisCuponesScreen() {
   // 🛠 Flag derivado: mientras sea la primera carga y no haya error, mostramos loader central
   const isBooting = boot || (items.length === 0 && loading && page === 1);
 
-  const ListHeader = useMemo(() => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>Mis cupones</Text>
-      <Text style={styles.headerSub}>{items.length} {items.length === 1 ? 'cupón' : 'cupones'}</Text>
-    </View>
-  ), [items.length]);
+  const ListHeader = useMemo(
+    () => (
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Mis cupones</Text>
+        <Text style={styles.headerSub}>
+          {items.length} {items.length === 1 ? 'cupón' : 'cupones'}
+        </Text>
+      </View>
+    ),
+    [items.length]
+  );
 
-  const ListFooter = useMemo(() => (
-    <View style={styles.footerWrap}>
-      {loading && <ActivityIndicator size="small" color={UI.primary} />}
-      {!loading && !hasMore && items.length > 0 && (
-        <Text style={styles.endText}>No hay más cupones</Text>
-      )}
-    </View>
-  ), [loading, hasMore, items.length]);
+  const ListFooter = useMemo(
+    () => (
+      <View style={styles.footerWrap}>
+        {loading && <ActivityIndicator size="small" color={UI.primary} />}
+        {!loading && !hasMore && items.length > 0 && (
+          <Text style={styles.endText}>No hay más cupones</Text>
+        )}
+      </View>
+    ),
+    [loading, hasMore, items.length]
+  );
 
-  const Empty = useMemo(() => (
-    <View style={styles.empty}>
-      {isBooting ? (
-        <>
-          <ActivityIndicator size="large" color={UI.primary} />
-          <Text style={styles.muted}>Cargando cupones…</Text>
-        </>
-      ) : error ? (
-        <>
-          <Ionicons name="warning-outline" size={28} color={UI.danger} />
-          <Text style={styles.errorText}>Ocurrió un error: {error}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={() => loadPage(1, true)}>
-            <Text style={styles.retryText}>Reintentar</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Ionicons name="ticket-outline" size={28} color={UI.textMuted} />
-          <Text style={styles.muted}>No tenés cupones disponibles.</Text>
-        </>
-      )}
-    </View>
-  ), [isBooting, error, loadPage]);
+  const Empty = useMemo(
+    () => (
+      <View style={styles.empty}>
+        {isBooting ? (
+          <>
+            <ActivityIndicator size="large" color={UI.primary} />
+            <Text style={styles.muted}>Cargando cupones…</Text>
+          </>
+        ) : error ? (
+          <>
+            <Ionicons name="warning-outline" size={28} color={UI.danger} />
+            <Text style={styles.errorText}>Ocurrió un error: {error}</Text>
+            <TouchableOpacity style={styles.retryBtn} onPress={() => loadPage(1, true)}>
+              <Text style={styles.retryText}>Reintentar</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Ionicons name="ticket-outline" size={28} color={UI.textMuted} />
+            <Text style={styles.muted}>No tenés cupones disponibles.</Text>
+          </>
+        )}
+      </View>
+    ),
+    [isBooting, error, loadPage]
+  );
 
   return (
     <View style={styles.container}>
@@ -403,13 +442,16 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   imageWrap: { justifyContent: 'center', alignItems: 'center', overflow: 'hidden' },
-  image: { width: '100%', height: CARD_H, backgroundColor: '#f3f4f6' },
+  image: { width: '100%', height: CARD_H, backgroundColor: COLORS.GRAY_LIGHTEST },
   imageLoader: { position: 'absolute', zIndex: 1 },
   imagePlaceholder: {
-    justifyContent: 'center', alignItems: 'center',
-    backgroundColor: '#f5f5f5', borderTopWidth: StyleSheet.hairlineWidth, borderColor: UI.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.GRAY_LIGHTEST,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: UI.border,
   },
-  imagePlaceholderText: { color: '#6b7280', fontSize: 13 },
+  imagePlaceholderText: { color: COLORS.GRAY_DARK, fontSize: 13 },
 
   cardBody: { padding: 12, gap: 6 },
   title: { fontSize: 18, fontWeight: '700', color: UI.text },
@@ -418,24 +460,46 @@ const styles = StyleSheet.create({
   link: { textDecorationLine: 'underline' },
   desc: { marginTop: 6, fontSize: 14, color: UI.text },
 
-  footerRow: { marginTop: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  badge: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    backgroundColor: UI.primary, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999,
+  footerRow: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  badgeText: { color: '#fff', fontSize: 12, fontWeight: '600' },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: UI.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
+  badgeText: { color: COLORS.WHITE, fontSize: 12, fontWeight: '600' },
   ctaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   ctaText: { color: UI.primary, fontWeight: '700' },
 
   footerWrap: { paddingVertical: 16, alignItems: 'center' },
   endText: { textAlign: 'center', color: UI.textMuted, fontSize: 12 },
 
-  empty: { flex: 1, padding: 24, alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: UI.bg },
+  empty: {
+    flex: 1,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: UI.bg,
+  },
   errorText: { color: UI.danger, textAlign: 'center' },
 
   retryBtn: {
-    marginTop: 8, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
-    backgroundColor: UI.card, borderWidth: StyleSheet.hairlineWidth, borderColor: UI.border,
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: UI.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: UI.border,
   },
   retryText: { color: UI.text, fontWeight: '600', textAlign: 'center' },
 });

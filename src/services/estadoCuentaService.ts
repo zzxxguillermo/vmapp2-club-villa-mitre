@@ -8,11 +8,11 @@ export const estadoCuentaService = {
   async getEstadoCuenta(): Promise<EstadoCuenta> {
     try {
       const response = await fetch(`${API_BASE_URL}/estado-cuenta`);
-      
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       return data;
     } catch (error) {
@@ -31,11 +31,11 @@ export const estadoCuentaService = {
         },
         body: JSON.stringify({ alDia }),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error ${response.status}: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       return data;
     } catch (error) {

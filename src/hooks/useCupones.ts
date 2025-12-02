@@ -1,11 +1,11 @@
 import { useCallback, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './redux';
-import { 
-  fetchCupones, 
-  fetchCuponById, 
-  setCategoriaSeleccionada, 
+import {
+  fetchCupones,
+  fetchCuponById,
+  setCategoriaSeleccionada,
   clearCategoriaSeleccionada,
-  clearError 
+  clearError,
 } from '../store/slices/cuponesSlice';
 import { CuponesState } from '../types';
 
@@ -14,7 +14,9 @@ export const useCupones = () => {
   const cupones = useAppSelector((state) => state.cupones.items);
   const loading = useAppSelector((state) => state.cupones.loading);
   const error = useAppSelector((state) => state.cupones.error);
-  const categoriaSeleccionada = useAppSelector((state) => (state.cupones as CuponesState).categoriaSeleccionada);
+  const categoriaSeleccionada = useAppSelector(
+    (state) => (state.cupones as CuponesState).categoriaSeleccionada
+  );
 
   const loadCupones = useCallback(() => {
     return dispatch(fetchCupones());
@@ -44,7 +46,7 @@ export const useCupones = () => {
 
   // Filter cupones by selected category
   const cuponesFiltrados = categoriaSeleccionada
-    ? cupones.filter(cupon => cupon.categoria === categoriaSeleccionada)
+    ? cupones.filter((cupon) => cupon.categoria === categoriaSeleccionada)
     : cupones;
 
   // Auto-load cupones on mount if not already loaded

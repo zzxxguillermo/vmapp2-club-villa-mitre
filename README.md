@@ -1,155 +1,50 @@
-# Villa Mitre App
+# 🛡️ Villa Mitre App
 
-Aplicación móvil para el Club Villa Mitre desarrollada con React Native y Expo.
+> Aplicación oficial del Club Villa Mitre, desarrollada con tecnología de punta para brindar la mejor experiencia a los socios.
 
-## 🚀 Inicio Rápido
+![Status](https://img.shields.io/badge/Status-Active-success) ![Platform](https://img.shields.io/badge/Platform-iOS%20%7C%20Android-blue) ![Tech](https://img.shields.io/badge/Tech-React%20Native%20%7C%20Expo-violet)
 
-### Prerrequisitos
-- Node.js (v18 o superior)
-- npm o yarn
-- Expo CLI
-- EAS CLI (para builds)
+## 📖 Sobre el Proyecto
 
-### Instalación
-```bash
-# Clonar el repositorio
-git clone [repository-url]
-cd vmapp2
+Esta aplicación permite a los socios del Club Villa Mitre gestionar su carnet digital, acceder a beneficios exclusivos, consultar actividades deportivas y mantenerse al día con las novedades del club.
 
-# Instalar dependencias
-npm install
+El proyecto ha sido recientemente refactorizado (2025) para adoptar una arquitectura **Feature-First**, gestión de estado moderna con **TanStack Query**, y optimizaciones de rendimiento avanzadas.
 
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus configuraciones
+## � Enlaces Rápidos
 
-# Iniciar en modo desarrollo
-npm start
-```
+Toda la documentación detallada se encuentra en la carpeta [`docs/`](./docs/):
 
-### Desarrollo
-```bash
-# Iniciar con Expo Go
-npm start
+*   **[⚙️ Guía de Configuración](./docs/SETUP.md)**: Cómo instalar y correr el proyecto desde cero.
+*   **[🏗️ Arquitectura](./docs/ARCHITECTURE.md)**: Estructura de carpetas, patrones de diseño y decisiones técnicas.
+*   **[🧪 Testing](./docs/TESTING.md)**: Estrategia de pruebas, mocks y cómo ejecutar los tests.
+*   **[📚 Archivo Histórico](./docs/archive/)**: Logs de refactorización y análisis previos.
 
-# Iniciar en Android
-npm run android
+## 🛠️ Stack Tecnológico
 
-# Iniciar en iOS
-npm run ios
-```
+*   **Core:** React Native (0.76+), Expo SDK 52
+*   **Lenguaje:** TypeScript
+*   **Estado Server:** TanStack Query (React Query) v5
+*   **Estado Client:** Redux Toolkit (solo Auth)
+*   **Navegación:** React Navigation v7
+*   **UI/Estilos:** StyleSheet nativo, Expo Image, FlashList
+*   **Motor JS:** Hermes (Optimized)
+*   **Testing:** Jest, React Native Testing Library
 
-## 📱 Builds
+## ✨ Optimizaciones Recientes
 
-### APK para Android
-```bash
-# Build de preview (testing)
-npm run build:android
-
-# Build de producción
-eas build --platform android --profile production
-```
-
-### Configuración
-- **Package ID**: `com.villamitre.vmapp2`
-- **API Base**: `http://surtekbb.com/api`
-- **Credenciales de prueba**: DNI `59964604`, Password `password123`
-
-## 📚 Documentación
-
-Toda la documentación del proyecto se encuentra en la carpeta [`docs/`](./docs/):
-
-- **[Arquitectura](./docs/ARCHITECTURE.md)** - Estructura y patrones del proyecto
-- **[API Contracts](./docs/API-MOBILE-CONTRACTS.md)** - Documentación de endpoints
-- **[Guía de Dependencias](./docs/DEPENDENCIES.md)** - Librerías y versiones
-- **[Integración Frontend-Backend](./docs/FRONTEND_BACKEND_INTEGRATION.md)** - Guía de integración
-- **[Plan de Testing](./docs/TEST_PLAN.md)** - Estrategia de pruebas
-- **[Troubleshooting de Red](./docs/NETWORK_TROUBLESHOOTING.md)** - Solución de problemas
-
-## 🛠️ Tecnologías
-
-- **Frontend**: React Native + Expo
-- **Estado**: Redux Toolkit
-- **Navegación**: React Navigation
-- **HTTP Client**: Axios
-- **Testing**: Jest + React Native Testing Library
-- **Build**: EAS Build
-
-## 🏗️ Estructura del Proyecto
-
-```
-src/
-├── components/     # Componentes reutilizables
-├── screens/        # Pantallas de la app
-├── services/       # Servicios API
-├── store/          # Estado global
-├── utils/          # Utilidades
-├── types/          # Tipos TypeScript
-└── styles/         # Estilos globales
-```
-
-## 🔧 Scripts Disponibles
-
-```bash
-npm start           # Iniciar Expo dev server
-npm run android     # Ejecutar en Android
-npm run ios         # Ejecutar en iOS
-npm run web         # Ejecutar en web
-npm run build:android   # Build APK Android
-npm run build:ios       # Build iOS
-npm test            # Ejecutar tests
-npm run lint        # Linter
-```
-
-## 🌐 Entornos
-
-### Desarrollo
-- Mock server con Mirage.js
-- Hot reload habilitado
-- Debug tools disponibles
-
-### Producción
-- API real: `http://surtekbb.com/api`
-- Optimizaciones habilitadas
-- Error tracking
-
-## 📋 Estado del Proyecto
-
-### Funcionalidades Core
-- ✅ Autenticación implementada
-- ✅ Navegación configurada
-- ✅ Integración API completa
-- ✅ Build APK funcional
-- 🔄 SSL certificate (pendiente)
-- 📋 Push notifications (planificado)
-
-### Sistema Gym (API v2.0)
-- ✅ **Tipos TypeScript actualizados** - Soporte completo para API v2.0
-- ✅ **gymService migrado** - Nuevos endpoints de sesiones y progreso
-- ✅ **Helpers creados** - Utilidades para frecuencias y formateo
-- 🔄 **Pantallas en migración** - Dashboard, Calendar, Templates
-- 📋 **Entrenamiento activo** - Pantalla en desarrollo
-- 📋 **Historial de progreso** - Próxima fase
-
-Ver: [Plan de Migración Gym v2.0](./docs/GYM_V2_MIGRATION_PLAN.md)
+*   **FlashList:** Listas de alto rendimiento (5x más rápidas que FlatList).
+*   **Expo Image:** Caché de imágenes avanzado y transiciones suaves.
+*   **Hermes Engine:** Activado explícitamente para menor tiempo de inicio y consumo de memoria.
+*   **Bundle Size:** Eliminación de dependencias pesadas (lodash) y tree-shaking optimizado.
 
 ## 🤝 Contribución
 
-1. Fork el proyecto
-2. Crear branch de feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit cambios (`git commit -m 'Agregar nueva funcionalidad'`)
-4. Push al branch (`git push origin feature/nueva-funcionalidad`)
-5. Abrir Pull Request
-
-## 📄 Licencia
-
-Este proyecto es privado y pertenece al Club Villa Mitre.
-
-## 📞 Soporte
-
-Para soporte técnico o consultas, contactar al equipo de desarrollo.
+1.  Asegúrate de leer la **[Guía de Configuración](./docs/SETUP.md)**.
+2.  Crea una rama para tu feature: `git checkout -b feature/mi-nueva-feature`.
+3.  Sigue los patrones definidos en **[Arquitectura](./docs/ARCHITECTURE.md)**.
+4.  Asegúrate de que los tests pasen: `npm test`.
+5.  Abre un Pull Request.
 
 ---
 
-**Última actualización**: Septiembre 2025  
-**Versión**: 1.0.0
+**Desarrollado con 💚 para el Club Villa Mitre**

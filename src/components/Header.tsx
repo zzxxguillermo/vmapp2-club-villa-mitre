@@ -23,21 +23,22 @@ export const Header: React.FC<HeaderProps> = ({
   children,
 }) => {
   const getHeaderStyle = (): ViewStyle => {
-    const baseStyle = backgroundColor === 'green' 
-      ? { 
-          ...theme.header,
-          paddingVertical: 32,
-          minHeight: 95,
-        }
-      : backgroundColor === 'dark'
-      ? theme.headerDark
-      : { 
-          ...theme.header, 
-          backgroundColor: COLORS.WHITE,
-          borderBottomWidth: 1,
-          borderBottomColor: COLORS.BORDER_LIGHT,
-        };
-    
+    const baseStyle =
+      backgroundColor === 'green'
+        ? {
+            ...theme.header,
+            paddingVertical: 32,
+            minHeight: 95,
+          }
+        : backgroundColor === 'dark'
+          ? theme.headerDark
+          : {
+              ...theme.header,
+              backgroundColor: COLORS.WHITE,
+              borderBottomWidth: 1,
+              borderBottomColor: COLORS.BORDER_LIGHT,
+            };
+
     return baseStyle;
   };
 
@@ -51,17 +52,12 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <View style={[getHeaderStyle(), style]}>
-      {showLogo && (
-        <Logo 
-          backgroundColor={getLogoBackground()} 
-          size={logoSize}
-        />
-      )}
-      
+      {showLogo && <Logo backgroundColor={getLogoBackground()} size={logoSize} />}
+
       {title && (
-        <Typography 
-          variant="h2" 
-          style={{ 
+        <Typography
+          variant="h2"
+          style={{
             color: getTextColor(),
             flex: 1,
             textAlign: showLogo ? 'center' : 'left',
@@ -75,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
           {title}
         </Typography>
       )}
-      
+
       {children}
     </View>
   );

@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { FloatingChatBot } from '../components/FloatingChatBot';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../features/auth/hooks/useAuth';
 import { COLORS } from '../constants/colors';
 
 type SubItem = { text: string };
@@ -40,8 +33,7 @@ const centroDeportivoOptions: CentroDeportivoOption[] = [
     sections: [
       {
         title: 'Información',
-        description:
-          'Espacio destinado a clases y actividades acuáticas del club.',
+        description: 'Espacio destinado a clases y actividades acuáticas del club.',
         bullets: [
           { text: 'Horarios y turnos organizados por niveles' },
           { text: 'Clases grupales e individuales' },
@@ -59,8 +51,7 @@ const centroDeportivoOptions: CentroDeportivoOption[] = [
     sections: [
       {
         title: 'Información',
-        description:
-          'Sala equipada para entrenamiento de fuerza y acondicionamiento.',
+        description: 'Sala equipada para entrenamiento de fuerza y acondicionamiento.',
         bullets: [
           { text: 'Circuitos de musculación y cardio' },
           { text: 'Rutinas orientadas a objetivos' },
@@ -78,8 +69,7 @@ const centroDeportivoOptions: CentroDeportivoOption[] = [
     sections: [
       {
         title: 'Servicios',
-        description:
-          'Orientados a la evaluación y cuidado de la salud deportiva.',
+        description: 'Orientados a la evaluación y cuidado de la salud deportiva.',
         bullets: [
           { text: 'Evaluación médica deportiva' },
           { text: 'Orientación para rehabilitación' },
@@ -116,13 +106,12 @@ export default function CentroDeportivoScreen() {
       // @ts-ignore - depende de tu tipado de rutas
       navigation.navigate(option.screen);
     } else {
-      setExpanded(prev => ({ ...prev, [option.id]: !prev[option.id] }));
+      setExpanded((prev) => ({ ...prev, [option.id]: !prev[option.id] }));
     }
   };
 
   // permitir expandir sin navegar manteniendo la navegación disponible
-  const toggleExpand = (id: string) =>
-    setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleExpand = (id: string) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
 
   return (
     <View style={styles.screenContainer}>
@@ -133,7 +122,7 @@ export default function CentroDeportivoScreen() {
         </Text>
 
         <View style={styles.optionsContainer}>
-          {centroDeportivoOptions.map(option => {
+          {centroDeportivoOptions.map((option) => {
             const isOpen = !!expanded[option.id];
             return (
               <View key={option.id} style={styles.cardWrapper}>
@@ -145,18 +134,12 @@ export default function CentroDeportivoScreen() {
                   onLongPress={() => toggleExpand(option.id)} // long-press para expandir sin navegar
                 >
                   <View style={styles.iconContainer}>
-                    <Ionicons
-                      name={option.icon}
-                      size={32}
-                      color={COLORS.PRIMARY_GREEN}
-                    />
+                    <Ionicons name={option.icon} size={32} color={COLORS.PRIMARY_GREEN} />
                   </View>
 
                   <View style={styles.textContainer}>
                     <Text style={styles.optionTitle}>{option.title}</Text>
-                    <Text style={styles.optionDescription}>
-                      {option.description}
-                    </Text>
+                    <Text style={styles.optionDescription}>{option.description}</Text>
                   </View>
 
                   <TouchableOpacity

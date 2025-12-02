@@ -85,7 +85,7 @@ const cuponesSlice = createSlice({
       })
       .addCase(fetchCuponById.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.items.findIndex(item => item.id === action.payload.id);
+        const index = state.items.findIndex((item) => item.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = action.payload;
         } else {
@@ -100,5 +100,6 @@ const cuponesSlice = createSlice({
   },
 });
 
-export const { clearError, setCategoriaSeleccionada, clearCategoriaSeleccionada } = cuponesSlice.actions;
+export const { clearError, setCategoriaSeleccionada, clearCategoriaSeleccionada } =
+  cuponesSlice.actions;
 export default cuponesSlice.reducer;

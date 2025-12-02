@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { gymService } from '../services/gymService';
+import { gymService } from '../features/gym/services/gymService';
 import { Assignment } from '../types/gym';
 
 interface UseStudentTemplatesParams {
@@ -23,7 +23,7 @@ export const useStudentTemplates = (
   params?: UseStudentTemplatesParams
 ): UseStudentTemplatesState => {
   const { studentId, autoFetch = true } = params || {};
-  
+
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(autoFetch);
   const [error, setError] = useState<string | null>(null);
@@ -32,13 +32,13 @@ export const useStudentTemplates = (
     try {
       setLoading(true);
       setError(null);
-      
+
       // If studentId is provided, use professor endpoint to view student's assignments
       // Otherwise, use student endpoint to view own assignments
-      const response = studentId 
+      const response = studentId
         ? await gymService.getStudentAssignments(studentId)
         : await gymService.getMyTemplates();
-        
+
       setAssignments(response);
     } catch (err: any) {
       console.error('Failed to fetch student assignments:', err);
@@ -63,7 +63,7 @@ export const useStudentTemplates = (
     assignments,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 

@@ -13,28 +13,28 @@ const workingTests = [
   {
     name: 'Tests Básicos',
     path: 'src/__tests__/basic.test.ts',
-    description: 'Configuración básica de Jest'
+    description: 'Configuración básica de Jest',
   },
   {
     name: 'AuthService Simple',
     path: 'src/__tests__/services/authService.simple.test.ts',
-    description: 'Tests de autenticación simplificados'
+    description: 'Tests de autenticación simplificados',
   },
   {
     name: 'PromotionService Simple',
     path: 'src/__tests__/services/promotionService.simple.test.ts',
-    description: 'Tests de promociones simplificados'
+    description: 'Tests de promociones simplificados',
   },
   {
     name: 'GymService Simple',
     path: 'src/__tests__/services/gymService.simple.test.ts',
-    description: 'Tests de gimnasio simplificados'
+    description: 'Tests de gimnasio simplificados',
   },
   {
     name: 'AuthFlow Simple',
     path: 'src/__tests__/integration/authFlow.simple.test.ts',
-    description: 'Tests de integración de autenticación'
-  }
+    description: 'Tests de integración de autenticación',
+  },
 ];
 
 let totalTests = 0;
@@ -48,15 +48,15 @@ workingTests.forEach((test, index) => {
     console.log(`${index + 1}. ${test.name}:`);
     console.log(`   📁 ${test.path}`);
     console.log(`   📝 ${test.description}`);
-    
-    const result = execSync(`npm test -- ${test.path} --silent`, { 
+
+    const result = execSync(`npm test -- ${test.path} --silent`, {
       encoding: 'utf8',
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
-    
+
     // Extraer información del resultado
     const lines = result.split('\n');
-    const testLine = lines.find(line => line.includes('Tests:'));
+    const testLine = lines.find((line) => line.includes('Tests:'));
     if (testLine) {
       const match = testLine.match(/(\d+) passed/);
       if (match) {
@@ -68,12 +68,11 @@ workingTests.forEach((test, index) => {
     } else {
       console.log(`   ✅ Test completado exitosamente`);
     }
-    
   } catch (error) {
     console.log(`   ❌ Error ejecutando test`);
     failedSuites++;
   }
-  
+
   console.log('');
 });
 

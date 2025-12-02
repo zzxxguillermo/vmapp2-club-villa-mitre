@@ -4,9 +4,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers } from '@reduxjs/toolkit';
 
 // Slices
-import authReducer from './slices/authSlice';
-import actividadesReducer from './slices/actividadesSlice';
-import actividadesClubReducer from './slices/actividadesClubSlice';
+import authReducer from '../features/auth/store/authSlice';
+
 import beneficiosReducer from './slices/beneficiosSlice';
 import cuponesReducer from './slices/cuponesSlice';
 import puntosReducer from './slices/puntosSlice';
@@ -23,8 +22,7 @@ const persistConfig = {
 // Root reducer
 const rootReducer = combineReducers({
   auth: authReducer,
-  actividades: actividadesReducer,
-  actividadesClub: actividadesClubReducer,
+
   beneficios: beneficiosReducer,
   cupones: cuponesReducer,
   puntos: puntosReducer,
@@ -42,7 +40,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-      }
+      },
     }),
   devTools: process.env.NODE_ENV !== 'production', // Solo en desarrollo
 });
@@ -55,8 +53,7 @@ export type RootState = ReturnType<typeof store.getState>;
 
 // Selectors helpers
 export const selectAuth = (state: RootState) => state.auth;
-export const selectActividades = (state: RootState) => state.actividades;
-export const selectActividadesClub = (state: RootState) => state.actividadesClub;
+
 export const selectBeneficios = (state: RootState) => state.beneficios;
 export const selectCupones = (state: RootState) => state.cupones;
 export const selectPuntos = (state: RootState) => state.puntos;

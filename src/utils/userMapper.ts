@@ -16,7 +16,7 @@ export const mapBackendUserToFrontend = (backendUser: any): Usuario => {
     proximoVencimiento: '',
     ultimoPago: '',
     montoUltimoPago: 0,
-    historialPagos: []
+    historialPagos: [],
   };
 
   const mappedUser = {
@@ -34,7 +34,7 @@ export const mapBackendUserToFrontend = (backendUser: any): Usuario => {
     promoted_at: backendUser.promoted_at,
     can_promote: backendUser.can_promote || false,
     is_complete: backendUser.is_complete || false,
-    
+
     // API-specific fields (for user_type: "api")
     nombre: backendUser.nombre,
     apellido: backendUser.apellido,
@@ -51,23 +51,37 @@ export const mapBackendUserToFrontend = (backendUser: any): Usuario => {
     barcode: backendUser.barcode,
     estado_socio: backendUser.estado_socio,
     api_updated_at: backendUser.api_updated_at,
-    
+
     // Nuevos campos de la API de terceros
     saldo: backendUser.saldo ? parseFloat(backendUser.saldo) : 0,
     semaforo: backendUser.semaforo ? parseInt(backendUser.semaforo) : undefined,
     foto_url: backendUser.foto_url,
-    
+
     created_at: backendUser.created_at,
     updated_at: backendUser.updated_at,
-    
+
     // Legacy fields for compatibility with existing components
-    fotoUrl: backendUser.foto_url || backendUser.profileImage || backendUser.image || backendUser.avatar || backendUser.photo || backendUser.picture || '',
-    profileImage: backendUser.foto_url || backendUser.profileImage || backendUser.image || backendUser.avatar || backendUser.photo || backendUser.picture || '',
+    fotoUrl:
+      backendUser.foto_url ||
+      backendUser.profileImage ||
+      backendUser.image ||
+      backendUser.avatar ||
+      backendUser.photo ||
+      backendUser.picture ||
+      '',
+    profileImage:
+      backendUser.foto_url ||
+      backendUser.profileImage ||
+      backendUser.image ||
+      backendUser.avatar ||
+      backendUser.photo ||
+      backendUser.picture ||
+      '',
     nroSocio: backendUser.socio_id || backendUser.socio_n || backendUser.id?.toString() || '', // Prioridad: socio_id > socio_n > id (socio_id se usa para URLs de fotos)
     codigoBarras: backendUser.barcode || '',
-    validoHasta: backendUser.api_updated_at || 
-                 new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-    estadoCuenta: backendUser.estadoCuenta || defaultEstadoCuenta
+    validoHasta:
+      backendUser.api_updated_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+    estadoCuenta: backendUser.estadoCuenta || defaultEstadoCuenta,
   };
 
   return mappedUser;
@@ -90,12 +104,12 @@ export const getUserDisplayName = (user: Usuario): string => {
 export const isUserProfileComplete = (user: Usuario): boolean => {
   const hasBasicInfo = !!(user.dni && user.name);
   const hasContactInfo = !!(user.email || user.phone);
-  
+
   if (user.user_type === 'api') {
     // API users should have more complete data
     return hasBasicInfo && hasContactInfo && user.is_complete;
   }
-  
+
   // Local users need at least basic info
   return hasBasicInfo && hasContactInfo;
 };

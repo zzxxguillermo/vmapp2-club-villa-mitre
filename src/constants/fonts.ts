@@ -5,13 +5,13 @@ export const FONTS = {
   BARLOW_MEDIUM: 'Barlow-Medium',
   BARLOW_SEMIBOLD: 'Barlow-SemiBold',
   BARLOW_BOLD: 'Barlow-Bold',
-  
+
   // Barlow Condensed
   BARLOW_CONDENSED_REGULAR: 'BarlowCondensed-Regular',
   BARLOW_CONDENSED_MEDIUM: 'BarlowCondensed-Medium',
   BARLOW_CONDENSED_SEMIBOLD: 'BarlowCondensed-SemiBold',
   BARLOW_CONDENSED_BOLD: 'BarlowCondensed-Bold',
-  
+
   // Barlow Semi Condensed
   BARLOW_SEMI_CONDENSED_REGULAR: 'BarlowSemiCondensed-Regular',
   BARLOW_SEMI_CONDENSED_MEDIUM: 'BarlowSemiCondensed-Medium',
@@ -20,7 +20,7 @@ export const FONTS = {
 } as const;
 
 // Tipos para TypeScript
-export type FontFamily = typeof FONTS[keyof typeof FONTS];
+export type FontFamily = (typeof FONTS)[keyof typeof FONTS];
 
 // Configuración de tamaños de texto
 export const FONT_SIZES = {
